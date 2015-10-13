@@ -36,3 +36,18 @@ solution(A1,A3,D1,D3,D5) :-
     word(D1,A,_,D,_),
     word(D3,B,_,E),
     word(D5,C,_,F,_).
+
+% The output.
+%
+% The representation of each solution is given where:
+% the first letter stands for the direction (A = across, D = down),
+% the number stands for the location on the puzzle,
+% and the value they contain stands for the word that is the solution.
+%
+% ?- puzzle(A1,A3,D1,D3,D5).
+% A1 = forum,
+% A3 = vanish,
+% D1 = five,
+% D3 = run,
+% D5 = mess ;
+% false.
