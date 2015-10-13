@@ -95,14 +95,14 @@ translate([W|Ws],Ds,[E|Es]) :- translate_word(W,Ds,E),translate(Ws,Ds,Es).  % Re
 dictionary_build([],[],[]).
 dictionary_build([W1|Ws],[E1|Es],[[W1,E1]|D]) :- dictionary_build(Ws,Es,D).
 
-% Word translation lists
+% Word translation lists:
 %
 % o,fortuna,velut,luna,statu,variabilis,semper,crescis,aut,decrescis,vita,detestabilis,nunc,obdurat,et,tunc,curat,egestatem,potestatem,dissolvit,ut,glaciem
 % o,fortune,like,'the moon',youre,changeable,ever,waxing,and,waning,life,hateful,first,oppresses,and,then,soothes,poverty,power,melts,like,ice
 
-% Building the dictionary
+% Building the dictionary:
 %
-% dictionary_build([o,fortuna,velut,luna,statu,variabilis,semper,crescis,aut,decrescis,vita,detestabilis,nunc,obdurat,et,tunc,curat,egestatem,potestatem,dissolvit,ut,glaciem],[o,fortune,like,'the moon',youre,changeable,ever,waxing,and,waning,life,hateful,first,oppresses,and,then,soothes,poverty,power,melts,like,ice],D),translate([o,fortuna,o,fortuna],D,X).
+% dictionary_build([o,fortuna,velut,luna,statu,variabilis,semper,crescis,aut,decrescis,vita,detestabilis,nunc,obdurat,et,tunc,curat,egestatem,potestatem,dissolvit,ut,glaciem],[o,fortune,like,'the moon',youre,changeable,ever,waxing,and,waning,life,hateful,first,oppresses,and,then,soothes,poverty,power,melts,like,ice],D).
 
 % Querying first 3 lines of the poem.
 %
