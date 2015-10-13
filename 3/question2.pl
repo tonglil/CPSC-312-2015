@@ -1,3 +1,7 @@
+% Tongli Li
+% 15688112
+% w6d8
+
 % The set of vocabulary available to the puzzle.
 %
 % The representation describes the vocabulary where:

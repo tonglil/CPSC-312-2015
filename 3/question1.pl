@@ -1,3 +1,7 @@
+% Tongli Li
+% 15688112
+% w6d8
+
 %% Part a
 
 % Dictionary of Latin-English word-pairs in lists nested in a list.
