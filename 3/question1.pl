@@ -230,36 +230,11 @@ translate_word_from_failable(W,[[_,E1]|Ds],E) :- E\=E1,translate_word_from_faila
 translate_word_from_failable(_,[],?).                                                           % If the dictionary for foreign words has been exhausted, use ? as the translation.
 translate_word_from_failable(?,[],_).                                                           % If the dictionary for English words has been exhausted, use ? as the translation.
 
-% Version 2
-% translate_start_word_from_failable(Lang,L,E) :- Lang=latin,dictionary_latin(Ds),translate_word_from_failable(L,Ds,E).     % Translate a Latin and/or English word using the hand-built Latin dictionary.
-% translate_start_word_from_failable(Lang,G,E) :- Lang=german,dictionary_german(Ds),translate_word_from_failable(G,Ds,E).   % Translate a German and/or English word using the hand-built German dictionary.
+start_translate_word_from_failable(Lang,L,E) :- Lang=latin,dictionary_latin(Ds),translate_word_from_failable(L,Ds,E).   % Translate a Latin and/or English word using the hand-built Latin dictionary.
+start_translate_word_from_failable(Lang,G,E) :- Lang=german,dictionary_german(Ds),translate_word_from_failable(G,Ds,E). % Translate a German and/or English word using the hand-built German dictionary.
 
-translate_from_failable(_,[],[]).                                                                                                                           % Base case: no words of either language.
-translate_from_failable(Lang,[W|Ws],[E|Es]) :- Lang=latin,dictionary_latin(Ds),translate_word_from_failable(W,Ds,E),translate_from_failable(Lang,Ws,Es).    % Recursion: translate the first given Latin and/or English words(s) with the Latin dictionary using the translate_word_from_failable function, and recurse with the remaining list of words and the same dictionary.
-translate_from_failable(Lang,[W|Ws],[E|Es]) :- Lang=german,dictionary_german(Ds),translate_word_from_failable(W,Ds,E),translate_from_failable(Lang,Ws,Es).  % Recursion: translate the first given german and/or English words(s) with the German dictionary using the translate_word_from_failable function, and recurse with the remaining list of words and the same dictionary.
-
-% Version 2
-% translate_from_failable(Lang,[W|Ws],[E|Es]) :- translate_start_word_from_failable(Lang,W,E),translate_from_failable(Lang,Ws,Es).  % Recursion: translate the first given foreign and/or English words(s) with a given dictionary using the translate_word function, and recurse with the remaining list of words and the same dictionary. 
-
-% time(translate_from_failable(german,[schoner],[beautiful])).
-% v1: 572,572,345
-% v2: 460,572,345
-% time(translate_from_failable(german,[schoner],X)).
-% v1: 572,346
-% v2: 460,346
-% time(translate_from_failable(german,X,[beautiful])).
-% v1: 576,345
-% v2: 461,345
-% time(translate_from_failable(german,[bad],X)).
-% v1: 598,357
-% v2: 486,357
-% time(translate_from_failable(german,X,[bad])).
-% v1: 612,343
-% v2: 500,343
-
-
-
-
+translate_from_failable(_,[],[]).                                                                                                   % Base case: no words of either language.
+translate_from_failable(Lang,[W|Ws],[E|Es]) :- start_translate_word_from_failable(Lang,W,E),translate_from_failable(Lang,Ws,Es).    % Recursion: translate the first given foreign and/or English words(s) using the start_translate_word_from_failable function, and recurse with the remaining list of words and the same dictionary.
 
 % Querying specific sentences with unidentified translations.
 %
