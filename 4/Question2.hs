@@ -9,4 +9,9 @@ harmonicNatural n
         harm = 1 / fromIntegral n
 
 harmonicTail :: Int -> Float
-harmonicTail n
+harmonicTail n = harmonicHelper n 1
+
+harmonicHelper :: Int -> Float -> Float
+harmonicHelper n total
+    | n == 1    = total
+    | otherwise = harmonicHelper (n - 1) (total + 1 / fromIntegral n)
