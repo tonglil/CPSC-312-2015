@@ -58,10 +58,14 @@ harmonicHelper n total
 
 -- Question 3
 
+-- Remove duplicated elements from a list to only keep the last instance.
 myremoveduplicates :: Eq a => [a] -> [a]
 myremoveduplicates list
+    -- The base case
     | null list                            = list
+    -- The recursive step: the first element exists in the rest of the list, so the answer is the result of recursing with the rest of the list
     | elem (head list) (tail list) == True = myremoveduplicates (tail list)
+    -- The recursive step: the first element does not exist in the rest of the list, so the answer is a list constructed with this element and the result of recursing with the tail of the list
     | otherwise                            = (head list) : myremoveduplicates (tail list)
 
 myremoveduplicates_pm :: Eq a => [a] -> [a]
