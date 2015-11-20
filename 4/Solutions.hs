@@ -68,10 +68,11 @@ myremoveduplicates list
     -- The recursive step: the first element does not exist in the rest of the list, so the answer is a list constructed with this element and the result of recursing with the tail of the list
     | otherwise                     = (head list) : myremoveduplicates (tail list)
 
+-- Remove duplicated elements from a list to only keep the last instance using pattern matching.
 myremoveduplicates_pm :: Eq a => [a] -> [a]
-myremoveduplicates_pm [] = []
-myremoveduplicates_pm (x : xs) | elem x xs = myremoveduplicates_pm xs
-myremoveduplicates_pm (x : xs) = x : myremoveduplicates_pm xs
+myremoveduplicates_pm [] = []                                           -- The base case
+myremoveduplicates_pm (x : xs) | elem x xs = myremoveduplicates_pm xs   -- 
+myremoveduplicates_pm (x : xs) = x : myremoveduplicates_pm xs           -- The recursive step: 
 
 mynthtail :: Int -> [a] -> [a]
 mynthtail n list
