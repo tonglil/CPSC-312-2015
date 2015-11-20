@@ -74,37 +74,61 @@ myremoveduplicates_pm [] = []                                           -- The b
 myremoveduplicates_pm (x : xs) | elem x xs = myremoveduplicates_pm xs   -- 
 myremoveduplicates_pm (x : xs) = x : myremoveduplicates_pm xs           -- The recursive step: 
 
+-- Get the last n elements of the list
 mynthtail :: Int -> [a] -> [a]
 mynthtail n list
+    -- The base case
     | n == 0 = list
+    -- The recursive step: call mynthtail with the tail of the list and decrement n
     | otherwise = mynthtail (n - 1) (tail list)
 
+-- Get the last n elements of the list through pattern matching
 mynthtail_pm :: Int -> [a] -> [a]
+-- The base case: if the first parameter is 0 return the list
 mynthtail_pm 0 list = list
+-- The recursive step: call mynthtail_pm with x - 1 and the tail of the list 
 mynthtail_pm x (_ : ys) = mynthtail_pm (x - 1) (ys)
 
+-- Check if the list is ordered
 myordered :: Ord a => [a] -> Bool
 myordered list
+    -- Base case: if the list is empty return true
     | null list = True
+    -- Base case: If the list only has one element return true
     | null (tail list) = True
+    -- The recursive step: If the head of the list is less than the greater than head of the tail call myordered with the tail
     | head list <= head (tail list) = myordered (tail list)
+    -- Return False otherwise 
     | otherwise = False
 
+-- Check if the list is ordered using pattern matching
 myordered_pm :: Ord a => [a] -> Bool
+-- Base case: Matches empty list pattern, return True
 myordered_pm [] = True
+-- Base case: Matches single element list pattern, return True
 myordered_pm [_] = True
+-- The recursive step: Matches pattern where first element is less than or equal to second element then calls my ordered with tail of list
 myordered_pm (x : y : xs) | x <= y = myordered_pm(y : xs)
+-- Return False otherwise
 myordered_pm (_ : _) = False
 
+-- Replace every list element of the second parameter with the first parameter
 myreplaceall :: Eq a => a -> a -> [a] -> [a]
 myreplaceall x y list
+    -- The base case: if the list is empty return an empty list
     | null list = []
+    -- Recursive step: if the head of the list equals the second parameter, call myreplaceall with the tail, prepended with the first parameter
     | y == head list = x : (myreplaceall x y (tail list))
+    -- Recursive step: if the head of the list doesn't equals the second parameter, call myreplaceall with the tail, prepended with original head of the list
     | otherwise = head list : (myreplaceall x y (tail list))
 
+-- Replace every list element of the second parameter with the first parameter using pattern matching
 myreplaceall_pm :: Eq a => a -> a -> [a] -> [a]
+-- The base case: Matches empty list pattern, return an empty list
 myreplaceall_pm _ _ [] = []
+-- Recursive step: Matches pattern that second parameter equals head of third parameter, call myreplaceall with the tail, prepended with the first parameter
 myreplaceall_pm x y (z : xs) | y == z = x : myreplaceall_pm x y xs
+-- Recursive step: Matches pattern that second parameter doesn't equal head of third parameter, call myreplaceall with the tail, prepended with original head of the list
 myreplaceall_pm x y (z : xs) = z : myreplaceall_pm x y xs
 
 -- The set of all available coins to use.
