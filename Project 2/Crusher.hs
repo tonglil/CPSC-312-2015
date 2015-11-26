@@ -139,7 +139,7 @@ run = crusher ["W------------BB-BBB","----W--------BB-BBB","-W-----------BB-BBB"
 grid0 = generateGrid 3 2 4 []
 slides0 = generateSlides grid0 3
 jumps0 = generateLeaps grid0 3
-board0 = sTrToBoard "WWW-WW-------BB-BBB"
+board0 = strToBoard "WWW-WW-------BB-BBB"
 newBoards0 = generateNewStates board0 [] grid0 slides0 jumps0 W
 tree0 = generateTree board0 [] grid0 slides0 jumps0 W 4 3
 heuristic0 = boardEvaluator W [] 3
@@ -185,7 +185,7 @@ gameOver :: Board -> [Board] -> Int -> Bool
 gameOver board history n = -- To Be Completed
 
 --
--- sTrToBoard
+-- strToBoard
 --
 -- This function consumes a list of characters which can be either 'W' or 'B'
 -- or '-' and converts them to a list of pieces, i.e W or B or D respectively
@@ -199,8 +199,8 @@ gameOver board history n = -- To Be Completed
 -- Returns: the Board corresponding to the string
 --
 
-sTrToBoard :: String  -> Board
-sTrToBoard s = map (\ x -> check x) s
+strToBoard :: String  -> Board
+strToBoard s = map (\ x -> check x) s
     where
         check 'W' = W
         check 'B' = B
