@@ -11,8 +11,8 @@
 
 -- Piece is a data representation of possible pieces on a board
 -- where D is an empty spot on the board
---		 W is a piece of the White player
---		 B is a piece of the Black player
+--       W is a piece of the White player
+--       B is a piece of the Black player
 --
 
 data Piece = D | W | B deriving (Eq, Show)
@@ -27,9 +27,9 @@ data Piece = D | W | B deriving (Eq, Show)
 type Point = (Int, Int)
 
 --
--- Tile is a tuple of 2 elements 
+-- Tile is a tuple of 2 elements
 -- representing what a point is occupied by
--- where the first element represents a piece 
+-- where the first element represents a piece
 --       the second element represents a point
 --
 
@@ -45,7 +45,7 @@ type Board = [Piece]
 
 --
 -- Grid is a list of Points, thus it is an internal representation
--- of the hexagonal grid system translated into a coordinate 
+-- of the hexagonal grid system translated into a coordinate
 -- system to easily maintain and make moves on the board
 --
 
@@ -62,24 +62,24 @@ type State = [Tile]
 --
 -- Next is a data representation for storing and passing around information within
 -- the tree generating function, allowing it to correctly generate new children
--- 
+--
 -- Next consists of 4 elements
 -- where usedDepth is an integer reprsenting the current depth level
---		 newBoard is the next board to add to the tree
--- 		 seenBoards is the updated history to avoid possible future trouble boards
--- 		 cplayer is the current player for whom the board was generated for
+--       newBoard is the next board to add to the tree
+--       seenBoards is the updated history to avoid possible future trouble boards
+--       cplayer is the current player for whom the board was generated for
 --
 
 data Next a = Next {usedDepth :: Int, newBoard :: a, seenBoards :: [a], cplayer :: Piece}
 
 --
--- Tree is a data representation for the search tree, it is an extention of 
+-- Tree is a data representation for the search tree, it is an extention of
 -- the rose tree widely used for implementing such unequally branched search trees
 --
 -- Tree consists of 3 elements
 -- where depth is an integer representing the depth level of the node
--- 		 board is the game state at that node
--- 		 nextBoards are the child nodes of the current node
+--       board is the game state at that node
+--       nextBoards are the child nodes of the current node
 --
 
 data Tree a = Node {depth :: Int, board :: a, nextBoards :: [Tree a]} deriving (Show)
@@ -95,7 +95,7 @@ type BoardTree = Tree Board
 -- Slide is a tuple of 2 elements
 -- an internal representation of a slide
 -- where the first element represents the point to move from
--- 		 the second element represents the adjacent point to move to
+--       the second element represents the adjacent point to move to
 --
 
 type Slide = (Point,Point)
@@ -104,8 +104,8 @@ type Slide = (Point,Point)
 -- Jump is a tuple of 2 elements
 -- an internal representation of a leap
 -- where the first element represents the point to move from
--- 		 the second element represents the adjacent point to move over
---		 the third element represents the point to move to
+--       the second element represents the adjacent point to move over
+--       the third element represents the point to move to
 --
 
 type Jump = (Point,Point,Point)
@@ -114,17 +114,17 @@ type Jump = (Point,Point,Point)
 -- Move is a tuple of 2 elements
 -- an internal representation of a move
 -- where the first element represents the point to move from
--- 		 the second element represents the point to move to
+--       the second element represents the point to move to
 --
 -- Note: in essence it is the same as a slide however the idea
---		 is that a jump can be reduced to a move as in effect 
---		 nothing happens the point moved over in a jump
+--       is that a jump can be reduced to a move as in effect
+--       nothing happens the point moved over in a jump
 --
 
 type Move = (Point,Point)
 
 --
--- Some test results to see what functions are producing 
+-- Some test results to see what functions are producing
 --
 run = crusher ["W------------BB-BBB","----W--------BB-BBB","-W-----------BB-BBB"] 'W' 2 3
 grid0 = generateGrid 3 2 4 []
@@ -138,8 +138,8 @@ heuristic0 = boardEvaluator W [] 3
 --
 -- crusher
 --
--- This function consumes a list of boards, a player, the depth of 
--- search tree, the size of the provide boards, and produces the 
+-- This function consumes a list of boards, a player, the depth of
+-- search tree, the size of the provide boards, and produces the
 -- next best board possible for the provided player, and accordingly
 -- makes the move and returns new board consed onto the list of boards
 --
@@ -185,39 +185,39 @@ gameOver board history n = -- To Be Completed
 -- -- s: the String to convert into piece-wise representation
 --
 -- Note: This function would convert "WWW-WW-------BB-BBB" to
--- 	     [W,W,W,D,W,W,D,D,D,D,D,D,D,B,B,D,B,B,B]
+--       [W,W,W,D,W,W,D,D,D,D,D,D,D,B,B,D,B,B,B]
 --
 -- Returns: the Board corresponding to the string
 --
 
 sTrToBoard :: String  -> Board
 sTrToBoard s = map (\ x -> check x) s
-	where 
-		check 'W' = W
-		check 'B' = B
-		check '-' = D
+    where
+        check 'W' = W
+        check 'B' = B
+        check '-' = D
 
 --
 -- boardToStr
 --
--- This function consumes a board which is a list of either W or B  or D and 
+-- This function consumes a board which is a list of either W or B  or D and
 -- converts them to a list of characters, i.e 'W' or 'B' or 'D' respectively
 --
 -- Arguments:
 -- -- b: the Board to convert into char-wise representation
 --
--- Note: This function would convert [W,W,W,D,W,W,D,D,D,D,D,D,D,B,B,D,B,B,B] 
--- 	     to "WWW-WW-------BB-BBB"
+-- Note: This function would convert [W,W,W,D,W,W,D,D,D,D,D,D,D,B,B,D,B,B,B]
+--       to "WWW-WW-------BB-BBB"
 --
--- Returns: the String corresponding to the board 
+-- Returns: the String corresponding to the board
 --
 
 boardToStr :: Board -> String
 boardToStr b = map (\ x -> check x) b
-	where 
-		check W = 'W'
-		check B = 'B'
-		check D = '-'
+    where
+        check W = 'W'
+        check B = 'B'
+        check D = '-'
 
 --
 -- generateGrid
@@ -230,26 +230,26 @@ boardToStr b = map (\ x -> check x) b
 -- -- n1: one more than max x-coordinate in the row, initialized always to n
 -- -- n2: the number of rows away from the middle row of the grid
 -- -- n3: the current y-coordinate i.e the current row number
--- -- acc: an accumulator that keeps track of accumulating rows of grid 
---		   initialized to []
+-- -- acc: an accumulator that keeps track of accumulating rows of grid
+--         initialized to []
 --
 -- Note: This function on being passed 3 2 4 [] would produce
---		 [(0,0),(1,0),(2,0)
---		  (0,1),(1,1),(2,1),(3,1)
---		  (0,2),(1,2),(2,2),(3,2),(4,2)
---		  (0,3),(1,3),(2,3),(3,3)
---		  (0,4),(1,4),(2,4)]
+--       [(0,0),(1,0),(2,0)
+--        (0,1),(1,1),(2,1),(3,1)
+--        (0,2),(1,2),(2,2),(3,2),(4,2)
+--        (0,3),(1,3),(2,3),(3,3)
+--        (0,4),(1,4),(2,4)]
 --
 -- Returns: the corresponding Grid i.e the acc when n3 == -1
 --
 
 generateGrid :: Int -> Int -> Int -> Grid -> Grid
-generateGrid n1 n2 n3 acc 
-	| n3 == -1		= acc
-	| otherwise 	= generateGrid nn1 (n2 - 1) (n3 - 1) (row ++ acc)
-		where
-			row = map (\ x -> (x,n3)) [0 .. (n1 - 1)]
-			nn1 = if n2 > 0 then n1 + 1 else n1 - 1
+generateGrid n1 n2 n3 acc
+    | n3 == -1      = acc
+    | otherwise     = generateGrid nn1 (n2 - 1) (n3 - 1) (row ++ acc)
+        where
+            row = map (\ x -> (x,n3)) [0 .. (n1 - 1)]
+            nn1 = if n2 > 0 then n1 + 1 else n1 - 1
 
 --
 -- generateSlides
@@ -259,20 +259,20 @@ generateGrid n1 n2 n3 acc
 -- any adjacent point on the grid
 --
 -- Arguments:
--- -- b: the Grid to generate slides for 
+-- -- b: the Grid to generate slides for
 -- -- n: an Integer representing the dimensions of the grid
--- 
--- Note: This function is only called at the initial setup of the game, 
--- 		 it is a part of the internal representation of the game, this 
---		 list of all possible slides is only generated once; and when 
--- 		 generating next moves, the program decides which slides out of 
---		 all these possible slides could a player actually make
+--
+-- Note: This function is only called at the initial setup of the game,
+--       it is a part of the internal representation of the game, this
+--       list of all possible slides is only generated once; and when
+--       generating next moves, the program decides which slides out of
+--       all these possible slides could a player actually make
 --
 -- Returns: the list of all Slides possible on the given grid
 --
 
 generateSlides :: Grid -> Int -> [Slide]
-generateSlides b n = -- To Be Completed 
+generateSlides b n = -- To Be Completed
 
 --
 -- generateLeaps
@@ -283,14 +283,14 @@ generateSlides b n = -- To Be Completed
 -- such that it is movement in the same direction
 --
 -- Arguments:
--- -- b: the Grid to generate leaps for 
+-- -- b: the Grid to generate leaps for
 -- -- n: an Integer representing the dimensions of the grid
--- 
--- Note: This function is only called at the initial setup of the game, 
--- 		 it is a part of the internal representation of the game, this 
---		 list of all possible leaps is only generated once; and when 
--- 		 generating next moves, the program decides which leaps out of 
---		 all these possible leaps could a player actually make
+--
+-- Note: This function is only called at the initial setup of the game,
+--       it is a part of the internal representation of the game, this
+--       list of all possible leaps is only generated once; and when
+--       generating next moves, the program decides which leaps out of
+--       all these possible leaps could a player actually make
 --
 -- Returns: the list of all Jumps possible on the given grid
 --
@@ -303,8 +303,8 @@ generateLeaps b n = -- To Be Completed
 --
 -- This function consumes the arguments described below, based on the internal
 -- representation of the game, if there is no point in playing the game as the
--- current board is in a state where the game has ended then just return the 
--- board, else generate a search tree till the specified depth and apply 
+-- current board is in a state where the game has ended then just return the
+-- board, else generate a search tree till the specified depth and apply
 -- minimax to it by using the appropriately generated heuristic
 --
 -- Arguments:
@@ -317,7 +317,7 @@ generateLeaps b n = -- To Be Completed
 -- -- depth: an Integer indicating depth of search tree
 -- -- num: an Integer representing the dimensions of the board
 --
--- Returns: the current board if game is over, 
+-- Returns: the current board if game is over,
 --          otherwise produces the next best board
 --
 
@@ -352,8 +352,8 @@ generateTree board history grid slides jumps player depth n = -- To Be Completed
 -- generateNewStates
 --
 -- This function consumes the arguments described below, it first generates a
--- list of valid moves, applies those moves to the current board to generate 
--- a list of next boards, and then checks whether or not that move would 
+-- list of valid moves, applies those moves to the current board to generate
+-- a list of next boards, and then checks whether or not that move would
 -- have been possible by filtering out those boards already seen before
 --
 -- Arguments:
@@ -373,9 +373,9 @@ generateNewStates board history grid slides jumps player = -- To Be Completed
 --
 -- moveGenerator
 --
--- This function consumes a state, a list of possible jumps, 
--- a list of possible slides and a player from whose perspective 
--- to generate moves, to check which of these jumps and slides 
+-- This function consumes a state, a list of possible jumps,
+-- a list of possible slides and a player from whose perspective
+-- to generate moves, to check which of these jumps and slides
 -- the player could actually make, and produces a list of valid moves
 --
 -- Arguments:
@@ -385,8 +385,8 @@ generateNewStates board history grid slides jumps player = -- To Be Completed
 -- -- player: W or B representing the player the program is
 --
 -- Note: This is the only instance where the program makes use of the
---		 type State, for our purposes it is zipping the board and the
---		 grid together for making it easier to make moves.
+--       type State, for our purposes it is zipping the board and the
+--       grid together for making it easier to make moves.
 --
 -- Note:
 -- -- oP is opponentsPieces
@@ -398,16 +398,16 @@ generateNewStates board history grid slides jumps player = -- To Be Completed
 --
 
 moveGenerator :: State -> [Slide] -> [Jump] -> Piece -> [Move]
-moveGenerator state slides jumps player = -- To Be Completed										 
+moveGenerator state slides jumps player = -- To Be Completed
 
 --
 -- boardEvaluator
 --
--- This function consumes a board and performs a static board evaluation, by 
--- taking into account whose perspective the program is playing from, the list 
+-- This function consumes a board and performs a static board evaluation, by
+-- taking into account whose perspective the program is playing from, the list
 -- of boards already seen, the size of the board, and whether or not it is the
--- program's turn or not; to generate quantitative measures of the board, and 
--- accordingly produce a goodness value of the given board 
+-- program's turn or not; to generate quantitative measures of the board, and
+-- accordingly produce a goodness value of the given board
 --
 -- Arguments:
 -- -- player: W or B representing the player the program is
@@ -425,15 +425,15 @@ boardEvaluator player history n board myTurn = -- To Be Completed
 --
 -- minimax
 --
--- This function implements the minimax algorithm, it consumes a search tree, 
+-- This function implements the minimax algorithm, it consumes a search tree,
 -- and an appropriate heuristic to apply to the tree, by applying minimax it
 -- produces the next best board that the program should make a move to
 --
 -- Arguments:
 -- -- (Node _ b children): a BoardTree to apply minimax algorithm on
 -- -- heuristic: a paritally evaluated boardEvaluator representing the
---				 appropriate heuristic to apply based on the size of the board,
---				 who the program is playing as, and all the boards already seen
+--               appropriate heuristic to apply based on the size of the board,
+--               who the program is playing as, and all the boards already seen
 --
 -- Returns: the next best board
 --
@@ -444,9 +444,9 @@ minimax (Node _ b children) heuristic = -- To Be Completed
 --
 -- minimax'
 --
--- This function is a helper to the actual minimax function, it consumes 
--- a search tree, an appropriate heuristic to apply to the leaf nodes of 
--- the tree, and based on whether it would have been the maximizing 
+-- This function is a helper to the actual minimax function, it consumes
+-- a search tree, an appropriate heuristic to apply to the leaf nodes of
+-- the tree, and based on whether it would have been the maximizing
 -- player's turn, it accordingly propogates the values upwards until
 -- it reaches the top to the base node, and produces that value.
 --
@@ -454,15 +454,14 @@ minimax (Node _ b children) heuristic = -- To Be Completed
 -- -- (Node _ b []): a BoardTree
 -- -- (Node _ b children): a BoardTree
 -- -- heuristic: a paritally evaluated boardEvaluator representing the
---				 appropriate heuristic to apply based on the size of the board,
---				 who the program is playing as, and all the boards already seen
+--               appropriate heuristic to apply based on the size of the board,
+--               who the program is playing as, and all the boards already seen
 -- -- maxPlayer: a Boolean indicating whether the function should be maximizing
--- 				 or miniziming the goodness values of its children
+--               or miniziming the goodness values of its children
 --
 -- Returns: the minimax value at the top of the tree
 --
 
 minimax' :: BoardTree -> (Board -> Bool -> Int) -> Bool -> Int
 minimax' boardTree heuristic maxPlayer = -- To Be Completed
-
 
