@@ -1,5 +1,14 @@
 -- CPSC 312 - Project 2
--- by Khurram Ali Jaffery
+
+{-
+   Byron Duenas
+   34095117
+   v5e8
+
+   Tongli Li
+   15688112
+   w6d8
+-}
 
 -- Main Components:
 -- minimax algorithm
