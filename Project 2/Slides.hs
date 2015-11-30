@@ -201,9 +201,9 @@ boardToStr b = map (\ x -> check x) b
 --
 -- Note: This function on being passed 3 2 4 [] would produce
 --       [(0,0),(1,0),(2,0)
---        (0,1),(1,1),(2,1),(3,1)
---        (0,2),(1,2),(2,2),(3,2),(4,2)
---        (0,3),(1,3),(2,3),(3,3)
+--     (0,1),(1,1),(2,1),(3,1)
+--  (0,2),(1,2),(2,2),(3,2),(4,2)
+--     (0,3),(1,3),(2,3),(3,3)
 --        (0,4),(1,4),(2,4)]
 --
 -- Returns: the corresponding Grid i.e the acc when n3 == -1
@@ -238,7 +238,17 @@ generateGrid n1 n2 n3 acc
 --
 
 generateSlides :: Grid -> Int -> [Slide]
-generateSlides b n = -- To Be Completed
+generateSlides b n -- To Be Completed
+    | b == null     = []
+    | otherwise     = helper (head b) n ++ generateSlides (tail b) n
+
+helper0 :: Point -> Int -> [Slide]
+helper0 p n
+    | fst p != 0    = ((fst p) -1, snd p) : helper1 p n
+    | otherwise     = helper1 p n
+
+head b
+
 
 --
 -- generateLeaps
