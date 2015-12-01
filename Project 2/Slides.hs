@@ -217,6 +217,9 @@ generateGrid n1 n2 n3 acc
             row = map (\ x -> (x,n3)) [0 .. (n1 - 1)]
             nn1 = if n2 > 0 then n1 + 1 else n1 - 1
 
+-- hexagonGrid :: Int -> Grid
+-- hexagonGrid sideLength = generateGrid (sideLength) (sideLength - 1) (2 * (sideLength - 1))
+
 --
 -- generateSlides
 --
@@ -237,56 +240,60 @@ generateGrid n1 n2 n3 acc
 -- Returns: the list of all Slides possible on the given grid
 --
 
+
 generateSlides :: Grid -> Int -> [Slide]
 generateSlides b n -- To Be Completed
     | null b        = []
-    | otherwise     = slideLeft (head b) n ++ generateSlides (tail b) n
+    | otherwise     = slideLeft b (head b) n ++ generateSlides (tail b) n
+    | otherwise = []
 
--- x-1,y
-slideLeft :: Point -> Int -> [Slide]
-slideLeft p n
-    | fst p /= 0    = (p, (fst p - 1, snd p)) : slideRight p n
-    | otherwise     = slideRight p n
+-- x - 1, y
+slideLeft :: Grid -> Point -> Int -> [Slide]
+slideLeft b p n
+    | elem (fst p - 1, snd p) b = (p, (fst p - 1, snd p)) : slideRight b p n
+    | otherwise                 = slideRight b p n
 
--- x+1,y
-slideRight :: Point -> Int -> [Slide]
-slideRight p n
-    | checkRightBound p n   = (p, (fst p + 1, snd p)) : slideUp p n
-    | otherwise             = slideUp p n
+-- x + 1, y
+slideRight :: Grid -> Point -> Int -> [Slide]
+slideRight b p n
+    | elem (fst p + 1, snd p) b = (p, (fst p + 1, snd p)) : slideDown b p n
+    | otherwise                 = slideDown b p n
 
--- x,y+1
-slideDown :: Point -> Int -> [Slide]
-slideDown p n
-    | snd p /= 0    = (p, ((fst p), snd p + 1)) : slideDown p n
-    | otherwise     = slideDown p n
-    -- Missing check (to top left, top right)
+-- x, y + 1
+slideDown :: Grid -> Point -> Int -> [Slide]
+slideDown b p n
+    | elem (fst p, snd p + 1) b = (p, (fst p, snd p + 1)) : slideUp b p n
+    | otherwise                 = slideUp b p n
 
--- x+1,y+1
-slideDownRight :: Point -> Int -> [Slide]
-slideDownRight p n
-    | checkRightBound p n && checkBottomBound p n = (p, (fst p + 1, snd p + 1)) : slideDownLeft p n
-    | otherwise     = slideDownLeft p n
+-- x, y - 1
+slideUp :: Grid -> Point -> Int -> [Slide]
+slideUp b p n
+    | elem (fst p, snd p - 1) b = (p, (fst p, snd p - 1)) : slideUpLeft b p n
+    | otherwise                 = slideUpLeft b p n
 
+-- x - 1, y - 1
+slideUpLeft :: Grid -> Point -> Int -> [Slide]
+slideUpLeft b p n
+    | (snd p) < n && elem (fst p - 1, snd p - 1) b  = (p, (fst p - 1, snd p - 1)) : slideDownRight b p n
+    | otherwise                         = slideDownRight b p n
 
-checkRightBound :: Point -> Int -> Bool
-checkRightBound p n
-    | fst p < (2 * n - 1) - (abs (n - (snd p) - 1)) = True
-    | otherwise                                     = False
+-- x + 1, y + 1
+slideDownRight :: Grid -> Point -> Int -> [Slide]
+slideDownRight b p n
+    | (snd p) < (n - 1) && elem (fst p + 1, snd p + 1) b  = (p, (fst p + 1, snd p + 1)) : slideUpRight b p n
+    | otherwise                         = slideUpRight b p n
 
-checkBottomBound :: Point -> Int -> Bool
-checkBottomBound p n
-    | snd p < (2 * n - 2)   = True
-    | otherwise             = False
+-- x + 1, y - 1
+slideUpRight :: Grid -> Point -> Int -> [Slide]
+slideUpRight b p n
+    | (snd p) > (n - 1) && elem (fst p + 1, snd p - 1) b  = (p, (fst p + 1, snd p - 1)) : slideDownLeft b p n
+    | otherwise                         = slideDownLeft b p n
 
-
-
-
-
-slideDown :: Point -> Int -> [Slide]
-slideDown p n = [(p,p)]
-    -- Missing check (to down left, down right)
-
-
+-- x - 1, y + 1
+slideDownLeft :: Grid -> Point -> Int -> [Slide]
+slideDownLeft b p n
+    | (snd p) >= (n - 1) && elem (fst p - 1, snd p + 1) b  = [(p, (fst p - 1, snd p + 1))]
+    | otherwise                         = []
 
 --
 -- generateLeaps
