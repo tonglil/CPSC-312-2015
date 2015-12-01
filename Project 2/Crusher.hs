@@ -182,7 +182,14 @@ crusher (current:old) p d n = -- To Be Completed
 --
 
 gameOver :: Board -> [Board] -> Int -> Bool
-gameOver board history n = -- To Be Completed
+gameOver board history n
+    | board `elem` history      = True
+    | insufficientPieces 'W'    = True
+    | insufficientPieces 'B'    = True
+    | otherwise                 = False
+        where
+            insufficientPieces 'W' = length (filter (== W) board) < n
+            insufficientPieces 'B' = length (filter (== B) board) < n
 
 --
 -- strToBoard
