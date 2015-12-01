@@ -182,7 +182,11 @@ crusher (current:old) p d n = -- To Be Completed
 --
 
 gameOver :: Board -> [Board] -> Int -> Bool
-gameOver board history n = -- To Be Completed
+gameOver board history n
+    | board `elem` history              = True  -- Look for the current board inside the history of boards
+    | length (filter (== W) board) < n  = True  -- Check if W has enough pieces
+    | length (filter (== B) board) < n  = True  -- Check if B has enough pieces
+    | otherwise                         = False -- Game continues
 
 --
 -- strToBoard
