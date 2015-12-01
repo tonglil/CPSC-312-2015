@@ -239,15 +239,53 @@ generateGrid n1 n2 n3 acc
 
 generateSlides :: Grid -> Int -> [Slide]
 generateSlides b n -- To Be Completed
-    | b == null     = []
-    | otherwise     = helper (head b) n ++ generateSlides (tail b) n
+    | null b        = []
+    | otherwise     = slideLeft (head b) n ++ generateSlides (tail b) n
 
-helper0 :: Point -> Int -> [Slide]
-helper0 p n
-    | fst p != 0    = ((fst p) -1, snd p) : helper1 p n
-    | otherwise     = helper1 p n
+-- x-1,y
+slideLeft :: Point -> Int -> [Slide]
+slideLeft p n
+    | fst p /= 0    = (p, (fst p - 1, snd p)) : slideRight p n
+    | otherwise     = slideRight p n
 
-head b
+-- x+1,y
+slideRight :: Point -> Int -> [Slide]
+slideRight p n
+    | checkRightBound p n   = (p, (fst p + 1, snd p)) : slideUp p n
+    | otherwise             = slideUp p n
+
+-- x,y+1
+slideDown :: Point -> Int -> [Slide]
+slideDown p n
+    | snd p /= 0    = (p, ((fst p), snd p + 1)) : slideDown p n
+    | otherwise     = slideDown p n
+    -- Missing check (to top left, top right)
+
+-- x+1,y+1
+slideDownRight :: Point -> Int -> [Slide]
+slideDownRight p n
+    | checkRightBound p n && checkBottomBound p n = (p, (fst p + 1, snd p + 1)) : slideDownLeft p n
+    | otherwise     = slideDownLeft p n
+
+
+checkRightBound :: Point -> Int -> Bool
+checkRightBound p n
+    | fst p < (2 * n - 1) - (abs (n - (snd p) - 1)) = True
+    | otherwise                                     = False
+
+checkBottomBound :: Point -> Int -> Bool
+checkBottomBound p n
+    | snd p < (2 * n - 2)   = True
+    | otherwise             = False
+
+
+
+
+
+slideDown :: Point -> Int -> [Slide]
+slideDown p n = [(p,p)]
+    -- Missing check (to down left, down right)
+
 
 
 --
