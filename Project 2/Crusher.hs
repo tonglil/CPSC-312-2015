@@ -300,7 +300,57 @@ generateGrid n1 n2 n3 acc
 --
 
 generateSlides :: Grid -> Int -> [Slide]
-generateSlides b n = -- To Be Completed
+generateSlides b n -- To Be Completed
+    | null b        = []
+    | otherwise     = slideLeft b (head b) n ++ generateSlides (tail b) n
+
+-- x - 1, y
+slideLeft :: Grid -> Point -> Int -> [Slide]
+slideLeft b p n
+    | elem (fst p - 1, snd p) b = (p, (fst p - 1, snd p)) : slideRight b p n
+    | otherwise                 = slideRight b p n
+
+-- x + 1, y
+slideRight :: Grid -> Point -> Int -> [Slide]
+slideRight b p n
+    | elem (fst p + 1, snd p) b = (p, (fst p + 1, snd p)) : slideDown b p n
+    | otherwise                 = slideDown b p n
+
+-- x, y + 1
+slideDown :: Grid -> Point -> Int -> [Slide]
+slideDown b p n
+    | elem (fst p, snd p + 1) b = (p, (fst p, snd p + 1)) : slideUp b p n
+    | otherwise                 = slideUp b p n
+
+-- x, y - 1
+slideUp :: Grid -> Point -> Int -> [Slide]
+slideUp b p n
+    | elem (fst p, snd p - 1) b = (p, (fst p, snd p - 1)) : slideUpLeft b p n
+    | otherwise                 = slideUpLeft b p n
+
+-- x - 1, y - 1
+slideUpLeft :: Grid -> Point -> Int -> [Slide]
+slideUpLeft b p n
+    | (snd p) < n && elem (fst p - 1, snd p - 1) b  = (p, (fst p - 1, snd p - 1)) : slideDownRight b p n
+    | otherwise                         = slideDownRight b p n
+
+-- x + 1, y + 1
+slideDownRight :: Grid -> Point -> Int -> [Slide]
+slideDownRight b p n
+    | (snd p) < (n - 1) && elem (fst p + 1, snd p + 1) b  = (p, (fst p + 1, snd p + 1)) : slideUpRight b p n
+    | otherwise                         = slideUpRight b p n
+
+-- x + 1, y - 1
+slideUpRight :: Grid -> Point -> Int -> [Slide]
+slideUpRight b p n
+    | (snd p) > (n - 1) && elem (fst p + 1, snd p - 1) b  = (p, (fst p + 1, snd p - 1)) : slideDownLeft b p n
+    | otherwise                         = slideDownLeft b p n
+
+-- x - 1, y + 1
+slideDownLeft :: Grid -> Point -> Int -> [Slide]
+slideDownLeft b p n
+    | (snd p) >= (n - 1) && elem (fst p - 1, snd p + 1) b  = [(p, (fst p - 1, snd p + 1))]
+    | otherwise                         = []
 
 --
 -- generateLeaps
