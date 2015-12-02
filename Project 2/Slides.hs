@@ -257,9 +257,12 @@ generateGrid n1 n2 n3 acc
 
 
 generateSlides :: Grid -> Int -> [Slide]
-generateSlides b n -- To Be Completed
-    | null b        = []
-    | otherwise     = slideLeft b (head b) n ++ generateSlides (tail b) n
+generateSlides b n = generateSlidesHelper b b n
+
+generateSlidesHelper :: Grid -> Grid -> Int -> [Slide]
+generateSlidesHelper originalGrid currentGrid n -- To Be Completed
+    | null currentGrid        = []
+    | otherwise     = slideLeft originalGrid (head currentGrid) n ++ generateSlidesHelper originalGrid (tail currentGrid) n
 
 -- x - 1, y
 slideLeft :: Grid -> Point -> Int -> [Slide]
@@ -310,9 +313,12 @@ slideDownLeft b p n
     | otherwise                         = []
 
 generateLeaps :: Grid -> Int -> [Jump]
-generateLeaps b n
-    | null b        = []
-    | otherwise     = jumpLeft b (head b) n ++ generateLeaps (tail b) n
+generateLeaps b n = generateLeapsHelper b b n
+
+generateLeapsHelper :: Grid -> Grid -> Int -> [Jump]
+generateLeapsHelper originalGrid currentGrid n -- To Be Completed
+    | null currentGrid        = []
+    | otherwise     = jumpLeft originalGrid (head currentGrid) n ++ generateLeapsHelper originalGrid (tail currentGrid) n
 
 -- x - 2, y
 jumpLeft :: Grid -> Point -> Int -> [Jump]
