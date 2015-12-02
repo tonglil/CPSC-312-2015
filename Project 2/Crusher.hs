@@ -374,7 +374,81 @@ slideDownLeft b p n
 --
 
 generateLeaps :: Grid -> Int -> [Jump]
-generateLeaps b n = -- To Be Completed
+generateLeaps b n
+    | null b        = []
+    | otherwise     = jumpLeft b (head b) n ++ generateLeaps (tail b) n
+
+-- x - 2, y
+jumpLeft :: Grid -> Point -> Int -> [Jump]
+jumpLeft b p n
+    | elem (fst p - 2, snd p) b = (p, (fst p - 1, snd p), (fst p - 2, snd p)) : jumpRight b p n
+    | otherwise                 = jumpRight b p n
+
+-- x + 2, y
+jumpRight :: Grid -> Point -> Int -> [Jump]
+jumpRight b p n
+    | elem (fst p + 2, snd p) b = (p, (fst p + 1, snd p), (fst p + 2, snd p)) : jumpDown b p n
+    | otherwise                 = jumpDown b p n
+
+-- x, y + 2
+jumpDown :: Grid -> Point -> Int -> [Jump]
+jumpDown b p n
+    | elem (fst p, snd p + 2) b = (p, (fst p, snd p + 1), (fst p, snd p + 2)) : jumpUp b p n
+    | otherwise                 = jumpUp b p n
+
+-- x, y - 2
+jumpUp :: Grid -> Point -> Int -> [Jump]
+jumpUp b p n
+    | elem (fst p, snd p - 2) b = (p, (fst p, snd p - 1), (fst p, snd p - 2)) : jumpUp2Left2 b p n
+    | otherwise                 = jumpUp2Left2 b p n
+
+-- x - 2, y - 2
+jumpUp2Left2 :: Grid -> Point -> Int -> [Jump]
+jumpUp2Left2 b p n
+    | snd p < n && elem (fst p - 2, snd p - 2) b = (p, (fst p - 1, snd p - 1), (fst p - 2, snd p - 2)) : jumpDown2Right2 b p n
+    | otherwise                 = jumpDown2Right2 b p n
+
+-- x + 2, y + 2
+jumpDown2Right2 :: Grid -> Point -> Int -> [Jump]
+jumpDown2Right2 b p n
+    | (snd p + 2) < n && elem (fst p + 2, snd p + 2) b = (p, (fst p + 1, snd p + 1), (fst p + 2, snd p + 2)) : jumpUp2Left1 b p n
+    | otherwise                 = jumpUp2Left1 b p n
+
+-- x - 1, y - 2
+jumpUp2Left1 :: Grid -> Point -> Int -> [Jump]
+jumpUp2Left1 b p n
+    | snd p == n && elem (fst p - 1, snd p - 2) b = (p, (fst p, snd p - 1), (fst p - 1, snd p - 2)) : jumpDown2Right1 b p n
+    | otherwise                 = jumpDown2Right1 b p n
+
+-- x + 1, y + 2
+jumpDown2Right1 :: Grid -> Point -> Int -> [Jump]
+jumpDown2Right1 b p n
+    | snd p == (n - 2) && elem (fst p + 1, snd p + 2) b = (p, (fst p + 1, snd p + 1), (fst p + 1, snd p + 2)) : jumpDown2Left2 b p n
+    | otherwise                 = jumpDown2Left2 b p n
+
+-- x - 2, y + 2
+jumpDown2Left2 :: Grid -> Point -> Int -> [Jump]
+jumpDown2Left2 b p n
+    | snd p > n - 2 && elem (fst p - 2, snd p + 2) b = (p, (fst p - 1, snd p + 1), (fst p - 2, snd p + 2)) : jumpUp2Right2 b p n
+    | otherwise                                 = jumpUp2Right2 b p n
+
+-- x + 2, y - 2
+jumpUp2Right2 :: Grid -> Point -> Int -> [Jump]
+jumpUp2Right2 b p n
+    | snd p > n && elem (fst p + 2, snd p - 2) b = (p, (fst p + 1, snd p - 1), (fst p + 2, snd p - 2)) : jumpUp2Right1 b p n
+    | otherwise                                      = jumpUp2Right1 b p n
+
+-- x + 1, y - 2
+jumpUp2Right1 :: Grid -> Point -> Int -> [Jump]
+jumpUp2Right1 b p n
+    | snd p == n && elem (fst p + 1, snd p - 2) b = (p, (fst p + 1, snd p - 1), (fst p + 1, snd p - 2)) : jumpDown2Left1 b p n
+    | otherwise                                      = jumpDown2Left1 b p n
+
+-- x - 1, y + 2
+jumpDown2Left1 :: Grid -> Point -> Int -> [Jump]
+jumpDown2Left1 b p n
+    | snd p == (n - 2) && elem (fst p - 1, snd p + 2) b = [(p, (fst p, snd p + 1), (fst p - 1, snd p + 2))]
+    | otherwise                                      = []
 
 --
 -- stateSearch
