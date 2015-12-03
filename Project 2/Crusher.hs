@@ -742,6 +742,33 @@ solveSlides state tile slides =
         freeStates = [snd x | x <- state, fst x == D]
 
 --
+-- solveLeaps
+--
+-- This function consumes a state, a tile, a list of possible jumps, and a piece
+-- to generate a list of valid jump moves from a tile
+--
+-- Arguments:
+-- -- state: a State representing the most recent state
+-- -- tile: the Tile to generate moves for
+-- -- jumps: the list of all Jumps possible for the given grid
+-- -- player: W or B representing the player the program is
+--
+-- Returns: the list of valid jump moves that the player could make from a tile
+--
+
+solveLeaps :: State -> Tile -> [Jump] -> Piece -> [Move]
+solveLeaps state tile jumps player =
+    -- Jump is valid when the end point is not occupied by the player; move is the start and end points
+    [(tripleFst x, tripleLst x) | x <- legalLeaps, elem (tripleLst x) freeStates]
+    where
+        -- Get jumps that start at the tile's point
+        allLeaps = [x | x <- jumps, tripleFst x == snd tile]
+        -- Of those jumps, check that the piece lept over is the player's color
+        legalLeaps = [x | x <- allLeaps, elem (player, tripleMid x) state]
+        -- All tiles not occupied by the player
+        freeStates = [snd x | x <- state, fst x /= player]
+
+--
 -- boardEvaluator
 --
 -- This function consumes a board and performs a static board evaluation, by
