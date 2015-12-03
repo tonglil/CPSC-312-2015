@@ -540,6 +540,20 @@ jumpDown2Left1 b p n
 
 
 
+
+
+{-
+   let string = "WWW-WW-------BB-BBB"
+   let board = strToBoard string
+   let grid = [(0,0),(1,0),(2,0),(0,1),(1,1),(2,1),(3,1),(0,2),(1,2),(2,2),(3,2),(4,2),(0,3),(1,3),(2,3),(3,3),(0,4),(1,4),(2,4)]
+   let state = boardToState board grid
+   let slides = generateSlides grid 3
+   let leaps = generateLeaps grid 3
+   let tile = (W,(0,0))
+   let moves = moveGenerator state slides leaps W
+   length moves
+-}
+
 -- Generate current state from board
 -- Generate all moves from current state (moveGenerator)
 -- Generate states based on moves
