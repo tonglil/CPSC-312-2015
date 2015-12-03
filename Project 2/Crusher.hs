@@ -718,6 +718,30 @@ moveGeneratorTile state tile slides jumps player =
     solveLeaps state tile jumps player
 
 --
+-- solveSlides
+--
+-- This function consumes a state, a tile, and a list of possible slides
+-- to generate a list of valid slide moves from a tile
+--
+-- Arguments:
+-- -- state: a State representing the most recent state
+-- -- tile: the Tile to generate moves for
+-- -- slides: the list of all Slides possible for the given grid
+--
+-- Returns: the list of valid slide moves that the player could make from a tile
+--
+
+solveSlides :: State -> Tile -> [Slide] -> [Move]
+solveSlides state tile slides =
+    -- Slide is valid when the end point is not occupied
+    [x | x <- allSlides, elem (snd x) freeStates]
+    where
+        -- Get slides that start at the tile's point
+        allSlides = [x | x <- slides, fst x == snd tile]
+        -- All empty tiles
+        freeStates = [snd x | x <- state, fst x == D]
+
+--
 -- boardEvaluator
 --
 -- This function consumes a board and performs a static board evaluation, by
