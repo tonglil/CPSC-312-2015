@@ -538,6 +538,101 @@ jumpDown2Left1 b p n
    generateNewStates board history grid slides jumps player = -- To Be Completed
 -}
 
+
+
+
+
+{-
+   let string = "WWW-WW-------BB-BBB"
+   let board = strToBoard string
+   let grid = [(0,0),(1,0),(2,0),(0,1),(1,1),(2,1),(3,1),(0,2),(1,2),(2,2),(3,2),(4,2),(0,3),(1,3),(2,3),(3,3),(0,4),(1,4),(2,4)]
+   let state = boardToState board grid
+   let slides = generateSlides grid 3
+   let leaps = generateLeaps grid 3
+   let tile = (W,(0,0))
+   let moves = moveGenerator state slides leaps W
+   length moves
+-}
+
+-- Generate current state from board
+-- Generate all moves from current state (moveGenerator)
+-- Generate states based on moves
+-- Convert states into board
+-- Filter out boards that have been played
+
+-- State = [Tile]
+-- Tile = (Piece, Point) = (W, (0,0))
+-- Piece = D | W | B
+-- Point = (Int, Int)
+-- Move = (Point, Point)
+
+
+
+
+
+--
+-- boardToState
+--
+-- This function consumes a Board and a Grid to generate the State of the game
+--
+-- Arguments:
+-- -- board: a list of Pieces representing the Board
+-- -- grid: a list of Points representing the Grid
+--
+-- Returns: a list of Tiles representing the State of the game
+--
+-- Example:
+--          let board = [W,W,W,D,W,W,D,D,D,D,D,D,B,B,B,D,B,B,D]
+--          let grid = [(0,0),(1,0),(2,0),(0,1),(1,1),(2,1),(3,1),(0,2),(1,2),(2,2),(3,2),(4,2),(0,3),(1,3),(2,3),(3,3),(0,4),(1,4),(2,4)]
+--          boardToState board grid
+--
+
+boardToState :: Board -> Grid -> State
+boardToState board grid
+    | null board    = []
+    | otherwise     = (head board, head grid) : boardToState (tail board) (tail grid)
+
+--
+-- stateToBoard
+--
+-- This function consumes a State to generate the Board of the game
+--
+-- Arguments:
+-- -- state: a list of Tiles representing the State of the game
+--
+-- Returns: a list of Pieces representing the Board
+--
+-- Example:
+--          let state = [(W,(0,0)),(W,(1,0)),(W,(2,0)),(D,(0,1)),(W,(1,1)),(W,(2,1)),(D,(3,1)),(D,(0,2)),(D,(1,2)),(D,(2,2)),(D,(3,2)),(D,(4,2)),(B,(0,3)),(B,(1,3)),(B,(2,3)),(D,(3,3)),(B,(0,4)),(B,(1,4)),(D,(2,4))]
+--          stateToBoard state
+--
+
+stateToBoard :: State -> Board
+stateToBoard state
+    | null state    = []
+    | otherwise     = fst (head state) : stateToBoard (tail state)
+
+--
+-- tripleFst, tripleMid, tripleLst
+--
+-- These functions consume a triple-tuple and returns the first, middle, or last element
+--
+-- Arguments
+-- -- a: anything
+-- -- b: anything
+-- -- c: anything
+--
+-- Returns: the selected value in the triple-tuple
+
+tripleFst :: (a, b, c) -> a
+tripleFst (x, _, _) = x
+
+tripleMid :: (a, b, c) -> b
+tripleMid (_, x, _) = x
+
+tripleLst :: (a, b, c) -> c
+tripleLst (_, _, x) = x
+
 --
 -- moveGenerator
 --
@@ -552,9 +647,11 @@ jumpDown2Left1 b p n
 -- -- jumps: the list of all Jumps possible for the given grid
 -- -- player: W or B representing the player the program is
 --
+-- Note: The bulk of the work is deferred to moveGeneratorHelper
+--
 -- Note: This is the only instance where the program makes use of the
 --       type State, for our purposes it is zipping the board and the
---       grid together for making it easier to make moves.
+--       grid together for making it easier to make moves
 --
 -- Note:
 -- -- oP is opponentsPieces
@@ -565,10 +662,111 @@ jumpDown2Left1 b p n
 -- Returns: the list of all valid moves that the player could make
 --
 
-{-
-   moveGenerator :: State -> [Slide] -> [Jump] -> Piece -> [Move]
-   moveGenerator state slides jumps player = -- To Be Completed
--}
+moveGenerator :: State -> [Slide] -> [Jump] -> Piece -> [Move]
+moveGenerator state slides jumps player = moveGeneratorHelper state state slides jumps player
+
+--
+-- moveGeneratorHelper
+--
+-- This function generates moves for a state and tracks of the entire game state
+--
+-- Arguments:
+-- -- state: a State representing the most recent state
+-- -- remaining: the remaining states to generate moves for
+-- -- slides: the list of all Slides possible for the given grid
+-- -- jumps: the list of all Jumps possible for the given grid
+-- -- player: W or B representing the player the program is
+--
+-- Returns: the list of all valid moves that the player could make
+--
+
+moveGeneratorHelper :: State -> State -> [Slide] -> [Jump] -> Piece -> [Move]
+moveGeneratorHelper state remaining slides jumps player
+    -- No state to generate moves for
+    | null remaining        = []
+    -- Look for moves for the current Tile if it belongs to the player and add to the list of moves
+    | fst tile == player    = moveGeneratorTile state tile slides jumps player ++ next
+    -- Recurse and generate moves for the remaining Tiles
+    | otherwise             = next
+        where
+            tile = head remaining
+            next = moveGeneratorHelper state (tail remaining) slides jumps player
+
+--
+-- moveGeneratorTile
+--
+-- This function consumes a state, a tile, a list of possible jumps,
+-- a list of possible slides and a player from whose perspective
+-- to generate moves, to check which of these jumps and slides
+-- the player could actually make from a tile, and produces a list of valid moves
+--
+-- Arguments:
+-- -- state: a State representing the most recent state
+-- -- tile: the Tile to generate moves for
+-- -- slides: the list of all Slides possible for the given grid
+-- -- jumps: the list of all Jumps possible for the given grid
+-- -- player: W or B representing the player the program is
+--
+-- Returns: the list of all valid moves that the player could make from a tile
+--
+
+moveGeneratorTile :: State -> Tile -> [Slide] -> [Jump] -> Piece -> [Move]
+moveGeneratorTile state tile slides jumps player =
+    -- Look for all slide moves possible from the current tile
+    solveSlides state tile slides ++
+    -- Look for all leap moves possible from the current tile
+    solveLeaps state tile jumps player
+
+--
+-- solveSlides
+--
+-- This function consumes a state, a tile, and a list of possible slides
+-- to generate a list of valid slide moves from a tile
+--
+-- Arguments:
+-- -- state: a State representing the most recent state
+-- -- tile: the Tile to generate moves for
+-- -- slides: the list of all Slides possible for the given grid
+--
+-- Returns: the list of valid slide moves that the player could make from a tile
+--
+
+solveSlides :: State -> Tile -> [Slide] -> [Move]
+solveSlides state tile slides =
+    -- Slide is valid when the end point is not occupied
+    [x | x <- allSlides, elem (snd x) freeStates]
+    where
+        -- Get slides that start at the tile's point
+        allSlides = [x | x <- slides, fst x == snd tile]
+        -- All empty tiles
+        freeStates = [snd x | x <- state, fst x == D]
+
+--
+-- solveLeaps
+--
+-- This function consumes a state, a tile, a list of possible jumps, and a piece
+-- to generate a list of valid jump moves from a tile
+--
+-- Arguments:
+-- -- state: a State representing the most recent state
+-- -- tile: the Tile to generate moves for
+-- -- jumps: the list of all Jumps possible for the given grid
+-- -- player: W or B representing the player the program is
+--
+-- Returns: the list of valid jump moves that the player could make from a tile
+--
+
+solveLeaps :: State -> Tile -> [Jump] -> Piece -> [Move]
+solveLeaps state tile jumps player =
+    -- Jump is valid when the end point is not occupied by the player; move is the start and end points
+    [(tripleFst x, tripleLst x) | x <- legalLeaps, elem (tripleLst x) freeStates]
+    where
+        -- Get jumps that start at the tile's point
+        allLeaps = [x | x <- jumps, tripleFst x == snd tile]
+        -- Of those jumps, check that the piece lept over is the player's color
+        legalLeaps = [x | x <- allLeaps, elem (player, tripleMid x) state]
+        -- All tiles not occupied by the player
+        freeStates = [snd x | x <- state, fst x /= player]
 
 --
 -- boardEvaluator
