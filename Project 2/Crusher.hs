@@ -1,3 +1,5 @@
+import Data.List
+
 -- CPSC 312 - Project 2
 
 {-
