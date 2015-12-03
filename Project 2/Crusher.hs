@@ -538,6 +538,22 @@ jumpDown2Left1 b p n
    generateNewStates board history grid slides jumps player = -- To Be Completed
 -}
 
+
+
+-- Generate current state from board
+-- Generate all moves from current state (moveGenerator)
+-- Generate states based on moves
+-- Convert states into board
+-- Filter out boards that have been played
+
+-- State = [Tile]
+-- Tile = (Piece, Point) = (W, (0,0))
+-- Piece = D | W | B
+-- Point = (Int, Int)
+-- Move = (Point, Point)
+
+
+
 --
 -- moveGenerator
 --
