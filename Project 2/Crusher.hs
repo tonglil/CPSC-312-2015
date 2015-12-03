@@ -613,6 +613,27 @@ stateToBoard state
     | otherwise     = fst (head state) : stateToBoard (tail state)
 
 --
+-- tripleFst, tripleMid, tripleLst
+--
+-- These functions consume a triple-tuple and returns the first, middle, or last element
+--
+-- Arguments
+-- -- a: anything
+-- -- b: anything
+-- -- c: anything
+--
+-- Returns: the selected value in the triple-tuple
+
+tripleFst :: (a, b, c) -> a
+tripleFst (x, _, _) = x
+
+tripleMid :: (a, b, c) -> b
+tripleMid (_, x, _) = x
+
+tripleLst :: (a, b, c) -> c
+tripleLst (_, _, x) = x
+
+--
 -- moveGenerator
 --
 -- This function consumes a state, a list of possible jumps,
