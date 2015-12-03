@@ -1,3 +1,5 @@
+import Data.List
+
 -- CPSC 312 - Project 2
 
 {-
@@ -533,11 +535,42 @@ jumpDown2Left1 b p n
 -- Returns: the list of next boards
 --
 
-{-
-   generateNewStates :: Board -> [Board] -> Grid -> [Slide] -> [Jump] -> Piece -> [Board]
-   generateNewStates board history grid slides jumps player = -- To Be Completed
--}
+generateNewStates :: Board -> [Board] -> Grid -> [Slide] -> [Jump] -> Piece -> [Board]
+generateNewStates board history grid slides jumps player =
+    map stateToBoard (applyMoves state moves player) \\ history -- set complement of history
+        where
+            state = boardToState board grid
+            moves = moveGenerator state slides jumps player
 
+-- Generate all possible states by applying each possible moves to the current state for a player
+applyMoves :: State -> [Move] -> Piece -> [State]
+applyMoves state moves player
+    | null moves    = []
+    | otherwise     = applyMove state (head moves) player : applyMoves state (tail moves) player
+
+-- Apply a move to the state to get a possible future state
+-- For each tile in state, check if move will change it
+applyMove :: State -> Move -> Piece -> State
+applyMove state move player
+    | null state    = [] -- This case doesn't really make sense
+    | otherwise     = processTile (head state) move player : applyMove (tail state) move player
+
+-- Convert the tile if it is part of the move
+processTile :: Tile -> Move -> Piece -> Tile
+processTile tile move player
+    -- The src tile -> becomes blank tile
+    | fst tile == player && snd tile == fst move    = (D, snd tile)
+    -- The dest tile -> becomes new tile
+    | snd tile == snd move                          = (player, snd tile)
+    -- This tile is not a part of the move
+    | otherwise                                     = tile
+
+
+-- For each move
+--      Apply to state to create a new state
+-- For each new state
+--      Convert to board
+--      Filter out ones that have been played before (in history)
 
 
 
@@ -546,12 +579,15 @@ jumpDown2Left1 b p n
    let string = "WWW-WW-------BB-BBB"
    let board = strToBoard string
    let grid = [(0,0),(1,0),(2,0),(0,1),(1,1),(2,1),(3,1),(0,2),(1,2),(2,2),(3,2),(4,2),(0,3),(1,3),(2,3),(3,3),(0,4),(1,4),(2,4)]
+   let past = ["-WW-WW---W---BB-BBB", "WWW-WW-------BB-BBB"]
+   let history = map strToBoard past
    let state = boardToState board grid
    let slides = generateSlides grid 3
-   let leaps = generateLeaps grid 3
+   let jumps = generateLeaps grid 3
    let tile = (W,(0,0))
-   let moves = moveGenerator state slides leaps W
-   length moves
+   let movesW = moveGenerator state slides jumps W
+   let playerW = W
+   length movesW
 -}
 
 -- Generate current state from board
