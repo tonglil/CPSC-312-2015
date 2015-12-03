@@ -535,31 +535,20 @@ jumpDown2Left1 b p n
 -- Returns: the list of next boards
 --
 
-{-
-   generateNewStates :: Board -> [Board] -> Grid -> [Slide] -> [Jump] -> Piece -> [Board]
-   generateNewStates board history grid slides jumps player -- To Be Completed
-       | null moves    = []
-       | otherwise     = (head moves)
-           where
-               state = boardToState board grid
-               moves = moveGenerator state slides jumps player
--}
+generateNewStates :: Board -> [Board] -> Grid -> [Slide] -> [Jump] -> Piece -> [Board]
+generateNewStates board history grid slides jumps player =
+    map stateToBoard (applyMoves state moves player) \\ history -- set complement of history
+        where
+            state = boardToState board grid
+            moves = moveGenerator state slides jumps player
 
+-- Generate all possible states by applying each possible moves to the current state for a player
 applyMoves :: State -> [Move] -> Piece -> [State]
 applyMoves state moves player
     | null moves    = []
     | otherwise     = applyMove state (head moves) player : applyMoves state (tail moves) player
 
-{-
-   let state = [(W,(0,0)),(W,(1,0)),(W,(2,0)),(D,(0,1)),(W,(1,1)),(W,(2,1)),(D,(3,1)),(D,(0,2)),(D,(1,2)),(D,(2,2)),(D,(3,2)),(D,(4,2)),(D,(0,3)),(B,(1,3)),(B,(2,3)),(D,(3,3)),(B,(0,4)),(B,(1,4)),(B,(2,4))]
-   --           ^ ---------------------------> ^
-   let tile = (W,(0,0))  -- Start tile
-   let tile2 = (D,(0,1)) -- Dest tile
-   let tile3 = (D,(1,1)) -- Not part of move
-   let move = ((0,0),(0,1))
-   let piece = W
--}
-
+-- Apply a move to the state to get a possible future state
 -- For each tile in state, check if move will change it
 applyMove :: State -> Move -> Piece -> State
 applyMove state move player
