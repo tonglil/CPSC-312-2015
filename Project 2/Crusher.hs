@@ -888,7 +888,8 @@ generateTree board history grid slides jumps player depth n = generateTreeHelper
 generateTreeHelper :: [Board] -> Grid -> [Slide] -> [Jump] -> Piece -> Int -> Int -> Int -> Board -> BoardTree
 generateTreeHelper history grid slides jumps player depth currentDepth n board
     | currentDepth == depth = (Node depth board [])
-    | otherwise = (Node currentDepth board (map (generateTreeHelper history grid slides jumps player depth (currentDepth + 1) n) (generateNewStates board history grid slides jumps player)))
+    | player == W  = (Node currentDepth board (map (generateTreeHelper history grid slides jumps B depth (currentDepth + 1) n) (generateNewStates board history grid slides jumps W)))
+    | otherwise = (Node currentDepth board (map (generateTreeHelper history grid slides jumps W depth (currentDepth + 1) n) (generateNewStates board history grid slides jumps B)))
 
 
 minimax :: BoardTree -> (Board -> Bool -> Int) -> Board
@@ -927,4 +928,4 @@ minimax' heuristic isMax (Node depth board nextBoards)
     | otherwise = maximum (map (minimax' heuristic False) nextBoards)
 
 minimaxTuple' :: (Board -> Bool -> Int) -> Bool -> BoardTree -> (BoardTree, Int)
-minimaxTuple' heuristic isWhite boardTree = (boardTree, (minimax' heuristic isWhite boardTree))
+minimaxTuple' heuristic isMax boardTree = (boardTree, (minimax' heuristic isMax boardTree))
