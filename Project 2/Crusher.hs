@@ -102,6 +102,12 @@ data Tree a = Node {depth :: Int, board :: a, nextBoards :: [Tree a]} deriving (
 
 type BoardTree = Tree Board
 
+
+--
+-- BoardTreeScore is a tuple of a BoardTree and its corresponding goodness value
+--
+type BoardTreeScore = (BoardTree, Int)
+
 --
 -- Slide is a tuple of 2 elements
 -- an internal representation of a slide
@@ -135,20 +141,6 @@ type Jump = (Point,Point,Point)
 type Move = (Point,Point)
 
 --
--- Some test results to see what functions are producing
---
-{-
-   run = crusher ["W------------BB-BBB","----W--------BB-BBB","-W-----------BB-BBB"] 'W' 2 3
-   grid0 = generateGrid 3 2 4 []
-   slides0 = generateSlides grid0 3
-   jumps0 = generateLeaps grid0 3
-   board0 = strToBoard "WWW-WW-------BB-BBB"
-   newBoards0 = generateNewStates board0 [] grid0 slides0 jumps0 W
-   tree0 = generateTree board0 [] grid0 slides0 jumps0 W 4 3
-   heuristic0 = boardEvaluator W [] 3
--}
-
---
 -- crusher
 --
 -- This function consumes a list of boards, a player, the depth of
@@ -169,8 +161,18 @@ type Move = (Point,Point)
 
 crusher :: [String] -> Char -> Int -> Int -> [String]
 crusher (current:old) p d n
-    | p == 'W' = boardToStr (minimax (generateTree (strToBoard current) (map strToBoard old) (generateHexagonGrid n) (generateSlides (generateHexagonGrid n) n) (generateLeaps (generateHexagonGrid n) n) W d n) (getWhiteScore)) : (current:old)
-    | otherwise = boardToStr (minimax (generateTree (strToBoard current) (map strToBoard old) (generateHexagonGrid n) (generateSlides (generateHexagonGrid n) n) (generateLeaps (generateHexagonGrid n) n) B d n) (getBlackScore)) : (current:old)
+    | p == 'W' = boardToStr (stateSearch (strToBoard current) (map strToBoard old) (generateHexagonGrid n) (generateSlides (generateHexagonGrid n) n) (generateLeaps (generateHexagonGrid n) n) W d n) : (current:old)
+    | otherwise = boardToStr (stateSearch (strToBoard current) (map strToBoard old) (generateHexagonGrid n) (generateSlides (generateHexagonGrid n) n) (generateLeaps (generateHexagonGrid n) n) B d n) : (current:old)
+
+-- generateHexagonGrid
+--
+-- This function consumes one integer and generates  a
+-- regular hexagon of side length n
+--
+-- Arguments:
+-- -- n: side length
+--
+-- Returns: the corresponding hexagon grid
 
 generateHexagonGrid :: Int -> Grid
 generateHexagonGrid n = generateGrid n (n - 1) (2 * (n - 1)) []
@@ -313,8 +315,11 @@ generateGrid n1 n2 n3 acc
 generateSlides :: Grid -> Int -> [Slide]
 generateSlides b n = generateSlidesHelper b b n
 
+-- helper to generateSlides and calls slideLeft, which starts to check all valid moves.
+-- The x and y translation that is being checked are documented above the slideLeft, slideRight, etc functions
+-- And are only added to the list of valid slides if they are a possible move
 generateSlidesHelper :: Grid -> Grid -> Int -> [Slide]
-generateSlidesHelper originalGrid currentGrid n -- To Be Completed
+generateSlidesHelper originalGrid currentGrid n
     | null currentGrid        = []
     | otherwise     = slideLeft originalGrid (head currentGrid) n ++ generateSlidesHelper originalGrid (tail currentGrid) n
 
@@ -391,7 +396,7 @@ generateLeaps :: Grid -> Int -> [Jump]
 generateLeaps b n = generateLeapsHelper b b n
 
 generateLeapsHelper :: Grid -> Grid -> Int -> [Jump]
-generateLeapsHelper originalGrid currentGrid n -- To Be Completed
+generateLeapsHelper originalGrid currentGrid n
     | null currentGrid        = []
     | otherwise     = jumpLeft originalGrid (head currentGrid) n ++ generateLeapsHelper originalGrid (tail currentGrid) n
 
@@ -490,10 +495,11 @@ jumpDown2Left1 b p n
 --          otherwise produces the next best board
 --
 
-{-
-   stateSearch :: Board -> [Board] -> Grid -> [Slide] -> [Jump] -> Piece -> Int -> Int -> Board
-   stateSearch board history grid slides jumps player depth num = -- To Be Completed
--}
+stateSearch :: Board -> [Board] -> Grid -> [Slide] -> [Jump] -> Piece -> Int -> Int -> Board
+stateSearch board history grid slides jumps player depth num
+    | gameOver  board history num = board
+    | player == W = minimax (generateTree board history grid slides jumps W depth num) getWhiteScore
+    | otherwise = minimax (generateTree board history grid slides jumps B depth num) getBlackScore
 
 --
 -- generateTree
@@ -516,10 +522,37 @@ jumpDown2Left1 b p n
 -- Returns: the corresponding BoardTree generated till specified depth
 --
 
-{-
-   generateTree :: Board -> [Board] -> Grid -> [Slide] -> [Jump] -> Piece -> Int -> Int -> BoardTree
-   generateTree board history grid slides jumps player depth n = -- To Be Completed
--}
+generateTree :: Board -> [Board] -> Grid -> [Slide] -> [Jump] -> Piece -> Int -> Int -> BoardTree
+generateTree board history grid slides jumps player depth n = generateTreeHelper history grid slides jumps player depth 0 n board
+
+
+--
+-- generateTreeHelper
+--
+-- This function is a helper to the actual generateTree function. This
+-- function consumes the arguments described below, and builds a search
+-- tree till specified depth from scratch by using the current board and
+-- generating all the next states recursively; however it doesn't generate
+-- children of those states which are in a state where the game has ended.
+--
+-- Arguments:
+-- -- history: a list of Boards of representing all boards already seen
+-- -- grid: the Grid representing the coordinate-grid the game being played
+-- -- slides: the list of all Slides possible for the given grid
+-- -- jumps: the list of all Jumps possible for the given grid
+-- -- player: W or B representing the player the program is
+-- -- depth: an Integer indicating depth of search tree
+-- -- n: an Integer representing the dimensions of the board
+-- -- board: a Board representing the most recent board
+--
+-- Returns: the corresponding BoardTree generated till specified depth
+--
+
+generateTreeHelper :: [Board] -> Grid -> [Slide] -> [Jump] -> Piece -> Int -> Int -> Int -> Board -> BoardTree
+generateTreeHelper history grid slides jumps player depth currentDepth n board
+    | currentDepth == depth = (Node depth board [])
+    | player == W  = (Node currentDepth board (map (generateTreeHelper history grid slides jumps B depth (currentDepth + 1) n) (generateNewStates board history grid slides jumps W)))
+    | otherwise = (Node currentDepth board (map (generateTreeHelper history grid slides jumps W depth (currentDepth + 1) n) (generateNewStates board history grid slides jumps B)))
 
 --
 -- generateNewStates
@@ -569,46 +602,6 @@ processTile tile move player
     | snd tile == snd move                          = (player, snd tile)
     -- This tile is not a part of the move
     | otherwise                                     = tile
-
-
--- For each move
---      Apply to state to create a new state
--- For each new state
---      Convert to board
---      Filter out ones that have been played before (in history)
-
-
-
-
-{-
-   let string = "WWW-WW-------BB-BBB"
-   let board = strToBoard string
-   let grid = [(0,0),(1,0),(2,0),(0,1),(1,1),(2,1),(3,1),(0,2),(1,2),(2,2),(3,2),(4,2),(0,3),(1,3),(2,3),(3,3),(0,4),(1,4),(2,4)]
-   let past = ["-WW-WW---W---BB-BBB", "WWW-WW-------BB-BBB"]
-   let history = map strToBoard past
-   let state = boardToState board grid
-   let slides = generateSlides grid 3
-   let jumps = generateLeaps grid 3
-   let tile = (W,(0,0))
-   let movesW = moveGenerator state slides jumps W
-   let playerW = W
-   length movesW
--}
-
--- Generate current state from board
--- Generate all moves from current state (moveGenerator)
--- Generate states based on moves
--- Convert states into board
--- Filter out boards that have been played
-
--- State = [Tile]
--- Tile = (Piece, Point) = (W, (0,0))
--- Piece = D | W | B
--- Point = (Int, Int)
--- Move = (Point, Point)
-
-
-
 
 
 --
@@ -810,30 +803,6 @@ solveLeaps state tile jumps player =
         freeStates = [snd x | x <- state, fst x /= player]
 
 --
--- boardEvaluator
---
--- This function consumes a board and performs a static board evaluation, by
--- taking into account whose perspective the program is playing from, the list
--- of boards already seen, the size of the board, and whether or not it is the
--- program's turn or not; to generate quantitative measures of the board, and
--- accordingly produce a goodness value of the given board
---
--- Arguments:
--- -- player: W or B representing the player the program is
--- -- history: a list of Boards of representing all boards already seen
--- -- n: an Integer representing the dimensions of the board
--- -- board: a Board representing the most recent board
--- -- myTurn: a Boolean indicating whether it is the program's turn or the opponents.
---
--- Returns: the goodness value of the provided board
---
-
-{-
-   boardEvaluator :: Piece -> [Board] -> Int -> Board -> Bool -> Int
-   boardEvaluator player history n board myTurn = -- To Be Completed
--}
-
---
 -- minimax
 --
 -- This function implements the minimax algorithm, it consumes a search tree,
@@ -849,10 +818,10 @@ solveLeaps state tile jumps player =
 -- Returns: the next best board
 --
 
-{-
-   minimax :: BoardTree -> (Board -> Bool -> Int) -> Board
-   minimax (Node _ b children) heuristic = -- To Be Completed
--}
+minimax :: BoardTree -> (Board -> Bool -> Int) -> Board
+minimax (Node _ b children) heuristic
+    | null children = b
+    | otherwise = board (fst (head (sortBy compareBoardTreeScores (map (minimaxTuple' heuristic True) children))))
 
 --
 -- minimax'
@@ -875,27 +844,23 @@ solveLeaps state tile jumps player =
 -- Returns: the minimax value at the top of the tree
 --
 
-{-
-   minimax' :: BoardTree -> (Board -> Bool -> Int) -> Bool -> Int
-   minimax' boardTree heuristic maxPlayer = -- To Be Completed
--}
+minimax' :: (Board -> Bool -> Int) -> Bool -> BoardTree -> Int
+minimax' heuristic isMax (Node depth board nextBoards)
+    | null nextBoards = heuristic board False
+    | isMax == False = minimum (map (minimax' heuristic True) nextBoards)
+    | otherwise = maximum (map (minimax' heuristic False) nextBoards)
 
-type BoardTreeScore = (BoardTree, Int)
-
-generateTree :: Board -> [Board] -> Grid -> [Slide] -> [Jump] -> Piece -> Int -> Int -> BoardTree
-generateTree board history grid slides jumps player depth n = generateTreeHelper history grid slides jumps player depth 0 n board
-
-generateTreeHelper :: [Board] -> Grid -> [Slide] -> [Jump] -> Piece -> Int -> Int -> Int -> Board -> BoardTree
-generateTreeHelper history grid slides jumps player depth currentDepth n board
-    | currentDepth == depth = (Node depth board [])
-    | player == W  = (Node currentDepth board (map (generateTreeHelper history grid slides jumps B depth (currentDepth + 1) n) (generateNewStates board history grid slides jumps W)))
-    | otherwise = (Node currentDepth board (map (generateTreeHelper history grid slides jumps W depth (currentDepth + 1) n) (generateNewStates board history grid slides jumps B)))
-
-
-minimax :: BoardTree -> (Board -> Bool -> Int) -> Board
-minimax (Node _ b children) heuristic
-    | null children = b
-    | otherwise = board (fst (head (sortBy compareBoardTreeScores (map (minimaxTuple' heuristic True) children))))
+--
+-- compareBoardTreeScores
+--
+-- This function is used to sort objects of type BoardTreeScore
+--
+-- Arguments:
+-- -- (a1,b1): a BoardTreeScore
+-- -- (a2,b2): a BoardTreeScore
+--
+-- Returns: the descending order of BoardTreeScore
+--
 
 compareBoardTreeScores :: BoardTreeScore -> BoardTreeScore -> Ordering
 compareBoardTreeScores (a1,b1) (a2,b2)
@@ -903,29 +868,55 @@ compareBoardTreeScores (a1,b1) (a2,b2)
      | b1 == b2     = EQ  
      | otherwise    = LT
 
+-- 
+-- getWhiteScore
+--
+-- This function is used to the goodness value of the board in perspective of W
+--
+-- Arguments:
+-- -- board: a Board
+-- -- _: a boolean that might be implemented later for a more accurate goodness value
+--
+-- Returns: the goodness value of the board
+--
+
 getWhiteScore :: Board -> Bool -> Int
-getWhiteScore board _ = countWhite board - countBlack board
+getWhiteScore board _ = square (countWhite board) - square (countBlack board)
+
+-- 
+-- getBlackScore
+--
+-- This function is used to the goodness value of the board in perspective of B
+--
+-- Arguments:
+-- -- board: a Board
+-- -- _: a boolean that might be implemented later for a more accurate goodness value
+--
+-- Returns: the goodness value of the board
+--
 
 getBlackScore :: Board -> Bool -> Int
-getBlackScore board _ = countBlack board - countWhite board
+getBlackScore board _ = square (countBlack board) - square (countWhite board)
 
+-- The 'square' function squares an integer.
+square :: Int -> Int
+square x = x * x
+
+-- Returns the number of B pieces on the board
 countBlack :: Board -> Int
 countBlack board
     | null board = 0
     | head board == B = 1 + countBlack (tail board)
     | otherwise = countBlack (tail board)
 
+-- Returns the number of W pieces on the board
 countWhite :: Board -> Int
 countWhite board
     | null board = 0
     | head board == W = 1 + countWhite (tail board)
     | otherwise = countWhite (tail board)
 
-minimax' :: (Board -> Bool -> Int) -> Bool -> BoardTree -> Int
-minimax' heuristic isMax (Node depth board nextBoards)
-    | null nextBoards = heuristic board False
-    | isMax == False = minimum (map (minimax' heuristic True) nextBoards)
-    | otherwise = maximum (map (minimax' heuristic False) nextBoards)
 
-minimaxTuple' :: (Board -> Bool -> Int) -> Bool -> BoardTree -> (BoardTree, Int)
+-- pairs a BoardTree with its corresponding goodnessValue
+minimaxTuple' :: (Board -> Bool -> Int) -> Bool -> BoardTree -> BoardTreeScore
 minimaxTuple' heuristic isMax boardTree = (boardTree, (minimax' heuristic isMax boardTree))
