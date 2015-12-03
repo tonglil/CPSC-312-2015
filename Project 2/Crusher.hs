@@ -647,9 +647,11 @@ tripleLst (_, _, x) = x
 -- -- jumps: the list of all Jumps possible for the given grid
 -- -- player: W or B representing the player the program is
 --
+-- Note: The bulk of the work is deferred to moveGeneratorHelper
+--
 -- Note: This is the only instance where the program makes use of the
 --       type State, for our purposes it is zipping the board and the
---       grid together for making it easier to make moves.
+--       grid together for making it easier to make moves
 --
 -- Note:
 -- -- oP is opponentsPieces
@@ -660,10 +662,60 @@ tripleLst (_, _, x) = x
 -- Returns: the list of all valid moves that the player could make
 --
 
-{-
-   moveGenerator :: State -> [Slide] -> [Jump] -> Piece -> [Move]
-   moveGenerator state slides jumps player = -- To Be Completed
--}
+moveGenerator :: State -> [Slide] -> [Jump] -> Piece -> [Move]
+moveGenerator state slides jumps player = moveGeneratorHelper state state slides jumps player
+
+--
+-- moveGeneratorHelper
+--
+-- This function generates moves for a state and tracks of the entire game state
+--
+-- Arguments:
+-- -- state: a State representing the most recent state
+-- -- remaining: the remaining states to generate moves for
+-- -- slides: the list of all Slides possible for the given grid
+-- -- jumps: the list of all Jumps possible for the given grid
+-- -- player: W or B representing the player the program is
+--
+-- Returns: the list of all valid moves that the player could make
+--
+
+moveGeneratorHelper :: State -> State -> [Slide] -> [Jump] -> Piece -> [Move]
+moveGeneratorHelper state remaining slides jumps player
+    -- No state to generate moves for
+    | null remaining        = []
+    -- Look for moves for the current Tile if it belongs to the player and add to the list of moves
+    | fst tile == player    = moveGeneratorTile state tile slides jumps player ++ next
+    -- Recurse and generate moves for the remaining Tiles
+    | otherwise             = next
+        where
+            tile = head remaining
+            next = moveGeneratorHelper state (tail remaining) slides jumps player
+
+--
+-- moveGeneratorTile
+--
+-- This function consumes a state, a tile, a list of possible jumps,
+-- a list of possible slides and a player from whose perspective
+-- to generate moves, to check which of these jumps and slides
+-- the player could actually make from a tile, and produces a list of valid moves
+--
+-- Arguments:
+-- -- state: a State representing the most recent state
+-- -- tile: the Tile to generate moves for
+-- -- slides: the list of all Slides possible for the given grid
+-- -- jumps: the list of all Jumps possible for the given grid
+-- -- player: W or B representing the player the program is
+--
+-- Returns: the list of all valid moves that the player could make from a tile
+--
+
+moveGeneratorTile :: State -> Tile -> [Slide] -> [Jump] -> Piece -> [Move]
+moveGeneratorTile state tile slides jumps player =
+    -- Look for all slide moves possible from the current tile
+    solveSlides state tile slides ++
+    -- Look for all leap moves possible from the current tile
+    solveLeaps state tile jumps player
 
 --
 -- boardEvaluator
