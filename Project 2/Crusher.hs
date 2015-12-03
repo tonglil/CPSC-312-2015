@@ -395,6 +395,9 @@ slideDownLeft b p n
 generateLeaps :: Grid -> Int -> [Jump]
 generateLeaps b n = generateLeapsHelper b b n
 
+-- helper to generateLeaps and calls jumpLeft, which starts to check all valid moves.
+-- The x and y translation that is being checked are documented above the jumpLeft, jumpRight, etc functions
+-- And are only added to the list of valid jumps if they are a possible move
 generateLeapsHelper :: Grid -> Grid -> Int -> [Jump]
 generateLeapsHelper originalGrid currentGrid n
     | null currentGrid        = []
