@@ -54,10 +54,11 @@ compareBoardTreeScores (a1,b1) (a2,b2)
 -- Returns: the minimax value at the top of the tree
 --
 
-getScore :: Board -> Bool -> Int
-getScore board isWhite
-  | isWhite == True = countWhite board - countBlack board
-  | otherwise = countBlack board - countWhite board
+getWhiteScore :: Board -> Bool -> Int
+getWhiteScore board _ = countWhite board - countBlack board
+
+getBlackScore :: Board -> Bool -> Int
+getBlackScore board _ = countBlack board - countWhite board
 
 countBlack :: Board -> Int
 countBlack board
@@ -71,15 +72,11 @@ countWhite board
     | head board == W = 1 + countWhite (tail board)
     | otherwise = countWhite (tail board)
 
--- both cases of isWhite might need to be "not"ed if result is opposite then what we expect
 minimax' :: (Board -> Bool -> Int) -> Bool -> BoardTree -> Int
-minimax' heuristic isWhite boardTree = minimaxHelper' heuristic isWhite isWhite boardTree
-
-minimaxHelper' :: (Board -> Bool -> Int) -> Bool -> Bool -> BoardTree -> Int
-minimaxHelper' heuristic isWhite isMax (Node depth board nextBoards)
-    | null nextBoards = heuristic board isWhite
-    | isMax == False = minimum (map (minimaxHelper' heuristic isWhite True) nextBoards)
-    | otherwise = maximum (map (minimaxHelper' heuristic isWhite False) nextBoards)
+minimax' heuristic isMax (Node depth board nextBoards)
+    | null nextBoards = heuristic board False
+    | isMax == False = minimum (map (minimax' heuristic True) nextBoards)
+    | otherwise = maximum (map (minimax' heuristic False) nextBoards)
 
 minimaxTuple' :: (Board -> Bool -> Int) -> Bool -> BoardTree -> (BoardTree, Int)
 minimaxTuple' heuristic isWhite boardTree = (boardTree, (minimax' heuristic isWhite boardTree))

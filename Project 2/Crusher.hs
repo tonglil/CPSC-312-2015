@@ -166,10 +166,14 @@ type Move = (Point,Point)
 -- Returns: a list of String with the new current board consed onto the front
 --
 
-{-
-   crusher :: [String] -> Char -> Int -> Int -> [String]
-   crusher (current:old) p d n = -- To Be Completed
--}
+
+crusher :: [String] -> Char -> Int -> Int -> [String]
+crusher (current:old) p d n
+    | p == 'W' = boardToStr (minimax (generateTree (strToBoard current) (map strToBoard old) (generateHexagonGrid n) (generateSlides (generateHexagonGrid n) n) (generateLeaps (generateHexagonGrid n) n) W d n) (getWhiteScore)) : (current:old)
+    | otherwise = boardToStr (minimax (generateTree (strToBoard current) (map strToBoard old) (generateHexagonGrid n) (generateSlides (generateHexagonGrid n) n) (generateLeaps (generateHexagonGrid n) n) B d n) (getBlackScore)) : (current:old)
+
+generateHexagonGrid :: Int -> Grid
+generateHexagonGrid n = generateGrid n (n - 1) (2 * (n - 1)) []
 
 --
 -- gameOver
@@ -237,6 +241,7 @@ boardToStr b = map (\ x -> check x) b
         check W = 'W'
         check B = 'B'
         check D = '-'
+
 
 --
 -- generateGrid
@@ -875,3 +880,51 @@ solveLeaps state tile jumps player =
    minimax' boardTree heuristic maxPlayer = -- To Be Completed
 -}
 
+type BoardTreeScore = (BoardTree, Int)
+
+generateTree :: Board -> [Board] -> Grid -> [Slide] -> [Jump] -> Piece -> Int -> Int -> BoardTree
+generateTree board history grid slides jumps player depth n = generateTreeHelper history grid slides jumps player depth 0 n board
+
+generateTreeHelper :: [Board] -> Grid -> [Slide] -> [Jump] -> Piece -> Int -> Int -> Int -> Board -> BoardTree
+generateTreeHelper history grid slides jumps player depth currentDepth n board
+    | currentDepth == depth = (Node depth board [])
+    | otherwise = (Node currentDepth board (map (generateTreeHelper history grid slides jumps player depth (currentDepth + 1) n) (generateNewStates board history grid slides jumps player)))
+
+
+minimax :: BoardTree -> (Board -> Bool -> Int) -> Board
+minimax (Node _ b children) heuristic
+    | null children = b
+    | otherwise = board (fst (head (sortBy compareBoardTreeScores (map (minimaxTuple' heuristic True) children))))
+
+compareBoardTreeScores :: BoardTreeScore -> BoardTreeScore -> Ordering
+compareBoardTreeScores (a1,b1) (a2,b2)
+     | b1 < b2      = GT  
+     | b1 == b2     = EQ  
+     | otherwise    = LT
+
+getWhiteScore :: Board -> Bool -> Int
+getWhiteScore board _ = countWhite board - countBlack board
+
+getBlackScore :: Board -> Bool -> Int
+getBlackScore board _ = countBlack board - countWhite board
+
+countBlack :: Board -> Int
+countBlack board
+    | null board = 0
+    | head board == B = 1 + countBlack (tail board)
+    | otherwise = countBlack (tail board)
+
+countWhite :: Board -> Int
+countWhite board
+    | null board = 0
+    | head board == W = 1 + countWhite (tail board)
+    | otherwise = countWhite (tail board)
+
+minimax' :: (Board -> Bool -> Int) -> Bool -> BoardTree -> Int
+minimax' heuristic isMax (Node depth board nextBoards)
+    | null nextBoards = heuristic board False
+    | isMax == False = minimum (map (minimax' heuristic True) nextBoards)
+    | otherwise = maximum (map (minimax' heuristic False) nextBoards)
+
+minimaxTuple' :: (Board -> Bool -> Int) -> Bool -> BoardTree -> (BoardTree, Int)
+minimaxTuple' heuristic isWhite boardTree = (boardTree, (minimax' heuristic isWhite boardTree))
