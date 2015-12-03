@@ -579,12 +579,15 @@ processTile tile move player
    let string = "WWW-WW-------BB-BBB"
    let board = strToBoard string
    let grid = [(0,0),(1,0),(2,0),(0,1),(1,1),(2,1),(3,1),(0,2),(1,2),(2,2),(3,2),(4,2),(0,3),(1,3),(2,3),(3,3),(0,4),(1,4),(2,4)]
+   let past = ["-WW-WW---W---BB-BBB", "WWW-WW-------BB-BBB"]
+   let history = map strToBoard past
    let state = boardToState board grid
    let slides = generateSlides grid 3
    let jumps = generateLeaps grid 3
    let tile = (W,(0,0))
-   let moves = moveGenerator state slides jumps W
-   length moves
+   let movesW = moveGenerator state slides jumps W
+   let playerW = W
+   length movesW
 -}
 
 -- Generate current state from board
