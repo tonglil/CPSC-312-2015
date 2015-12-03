@@ -568,6 +568,50 @@ jumpDown2Left1 b p n
 
 
 
+
+
+--
+-- boardToState
+--
+-- This function consumes a Board and a Grid to generate the State of the game
+--
+-- Arguments:
+-- -- board: a list of Pieces representing the Board
+-- -- grid: a list of Points representing the Grid
+--
+-- Returns: a list of Tiles representing the State of the game
+--
+-- Example:
+--          let board = [W,W,W,D,W,W,D,D,D,D,D,D,B,B,B,D,B,B,D]
+--          let grid = [(0,0),(1,0),(2,0),(0,1),(1,1),(2,1),(3,1),(0,2),(1,2),(2,2),(3,2),(4,2),(0,3),(1,3),(2,3),(3,3),(0,4),(1,4),(2,4)]
+--          boardToState board grid
+--
+
+boardToState :: Board -> Grid -> State
+boardToState board grid
+    | null board    = []
+    | otherwise     = (head board, head grid) : boardToState (tail board) (tail grid)
+
+--
+-- stateToBoard
+--
+-- This function consumes a State to generate the Board of the game
+--
+-- Arguments:
+-- -- state: a list of Tiles representing the State of the game
+--
+-- Returns: a list of Pieces representing the Board
+--
+-- Example:
+--          let state = [(W,(0,0)),(W,(1,0)),(W,(2,0)),(D,(0,1)),(W,(1,1)),(W,(2,1)),(D,(3,1)),(D,(0,2)),(D,(1,2)),(D,(2,2)),(D,(3,2)),(D,(4,2)),(B,(0,3)),(B,(1,3)),(B,(2,3)),(D,(3,3)),(B,(0,4)),(B,(1,4)),(D,(2,4))]
+--          stateToBoard state
+--
+
+stateToBoard :: State -> Board
+stateToBoard state
+    | null state    = []
+    | otherwise     = fst (head state) : stateToBoard (tail state)
+
 --
 -- moveGenerator
 --
