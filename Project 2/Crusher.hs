@@ -315,8 +315,8 @@ generateSlides b n = generateSlidesHelper b b n
 -- And are only added to the list of valid slides if they are a possible move
 generateSlidesHelper :: Grid -> Grid -> Int -> [Slide]
 generateSlidesHelper originalGrid currentGrid n
-    | null currentGrid        = []
-    | otherwise     = slideLeft originalGrid (head currentGrid) n ++ generateSlidesHelper originalGrid (tail currentGrid) n
+    | null currentGrid  = []
+    | otherwise         = slideLeft originalGrid (head currentGrid) n ++ generateSlidesHelper originalGrid (tail currentGrid) n
 
 -- x - 1, y
 slideLeft :: Grid -> Point -> Int -> [Slide]
@@ -346,25 +346,25 @@ slideUp b p n
 slideUpLeft :: Grid -> Point -> Int -> [Slide]
 slideUpLeft b p n
     | (snd p) < n && elem (fst p - 1, snd p - 1) b  = (p, (fst p - 1, snd p - 1)) : slideDownRight b p n
-    | otherwise                         = slideDownRight b p n
+    | otherwise                                     = slideDownRight b p n
 
 -- x + 1, y + 1
 slideDownRight :: Grid -> Point -> Int -> [Slide]
 slideDownRight b p n
-    | (snd p) < (n - 1) && elem (fst p + 1, snd p + 1) b  = (p, (fst p + 1, snd p + 1)) : slideUpRight b p n
-    | otherwise                         = slideUpRight b p n
+    | (snd p) < (n - 1) && elem (fst p + 1, snd p + 1) b    = (p, (fst p + 1, snd p + 1)) : slideUpRight b p n
+    | otherwise                                             = slideUpRight b p n
 
 -- x + 1, y - 1
 slideUpRight :: Grid -> Point -> Int -> [Slide]
 slideUpRight b p n
-    | (snd p) > (n - 1) && elem (fst p + 1, snd p - 1) b  = (p, (fst p + 1, snd p - 1)) : slideDownLeft b p n
-    | otherwise                         = slideDownLeft b p n
+    | (snd p) > (n - 1) && elem (fst p + 1, snd p - 1) b    = (p, (fst p + 1, snd p - 1)) : slideDownLeft b p n
+    | otherwise                                             = slideDownLeft b p n
 
 -- x - 1, y + 1
 slideDownLeft :: Grid -> Point -> Int -> [Slide]
 slideDownLeft b p n
-    | (snd p) >= (n - 1) && elem (fst p - 1, snd p + 1) b  = [(p, (fst p - 1, snd p + 1))]
-    | otherwise                         = []
+    | (snd p) >= (n - 1) && elem (fst p - 1, snd p + 1) b   = [(p, (fst p - 1, snd p + 1))]
+    | otherwise                                             = []
 
 --
 -- generateJumps
@@ -395,8 +395,8 @@ generateJumps b n = generateJumpsHelper b b n
 -- And are only added to the list of valid jumps if they are a possible move
 generateJumpsHelper :: Grid -> Grid -> Int -> [Jump]
 generateJumpsHelper originalGrid currentGrid n
-    | null currentGrid        = []
-    | otherwise     = jumpLeft originalGrid (head currentGrid) n ++ generateJumpsHelper originalGrid (tail currentGrid) n
+    | null currentGrid  = []
+    | otherwise         = jumpLeft originalGrid (head currentGrid) n ++ generateJumpsHelper originalGrid (tail currentGrid) n
 
 -- x - 2, y
 jumpLeft :: Grid -> Point -> Int -> [Jump]
@@ -425,50 +425,50 @@ jumpUp b p n
 -- x - 2, y - 2
 jumpUp2Left2 :: Grid -> Point -> Int -> [Jump]
 jumpUp2Left2 b p n
-    | snd p < n && elem (fst p - 2, snd p - 2) b = (p, (fst p - 1, snd p - 1), (fst p - 2, snd p - 2)) : jumpDown2Right2 b p n
-    | otherwise                 = jumpDown2Right2 b p n
+    | snd p < n && elem (fst p - 2, snd p - 2) b    = (p, (fst p - 1, snd p - 1), (fst p - 2, snd p - 2)) : jumpDown2Right2 b p n
+    | otherwise                                     = jumpDown2Right2 b p n
 
 -- x + 2, y + 2
 jumpDown2Right2 :: Grid -> Point -> Int -> [Jump]
 jumpDown2Right2 b p n
-    | (snd p + 2) < n && elem (fst p + 2, snd p + 2) b = (p, (fst p + 1, snd p + 1), (fst p + 2, snd p + 2)) : jumpUp2Left1 b p n
-    | otherwise                 = jumpUp2Left1 b p n
+    | (snd p + 2) < n && elem (fst p + 2, snd p + 2) b  = (p, (fst p + 1, snd p + 1), (fst p + 2, snd p + 2)) : jumpUp2Left1 b p n
+    | otherwise                                         = jumpUp2Left1 b p n
 
 -- x - 1, y - 2
 jumpUp2Left1 :: Grid -> Point -> Int -> [Jump]
 jumpUp2Left1 b p n
-    | snd p == n && elem (fst p - 1, snd p - 2) b = (p, (fst p, snd p - 1), (fst p - 1, snd p - 2)) : jumpDown2Right1 b p n
-    | otherwise                 = jumpDown2Right1 b p n
+    | snd p == n && elem (fst p - 1, snd p - 2) b       = (p, (fst p, snd p - 1), (fst p - 1, snd p - 2)) : jumpDown2Right1 b p n
+    | otherwise                                         = jumpDown2Right1 b p n
 
 -- x + 1, y + 2
 jumpDown2Right1 :: Grid -> Point -> Int -> [Jump]
 jumpDown2Right1 b p n
     | snd p == (n - 2) && elem (fst p + 1, snd p + 2) b = (p, (fst p + 1, snd p + 1), (fst p + 1, snd p + 2)) : jumpDown2Left2 b p n
-    | otherwise                 = jumpDown2Left2 b p n
+    | otherwise                                         = jumpDown2Left2 b p n
 
 -- x - 2, y + 2
 jumpDown2Left2 :: Grid -> Point -> Int -> [Jump]
 jumpDown2Left2 b p n
-    | snd p > n - 2 && elem (fst p - 2, snd p + 2) b = (p, (fst p - 1, snd p + 1), (fst p - 2, snd p + 2)) : jumpUp2Right2 b p n
-    | otherwise                                 = jumpUp2Right2 b p n
+    | snd p > n - 2 && elem (fst p - 2, snd p + 2) b    = (p, (fst p - 1, snd p + 1), (fst p - 2, snd p + 2)) : jumpUp2Right2 b p n
+    | otherwise                                         = jumpUp2Right2 b p n
 
 -- x + 2, y - 2
 jumpUp2Right2 :: Grid -> Point -> Int -> [Jump]
 jumpUp2Right2 b p n
-    | snd p > n && elem (fst p + 2, snd p - 2) b = (p, (fst p + 1, snd p - 1), (fst p + 2, snd p - 2)) : jumpUp2Right1 b p n
-    | otherwise                                      = jumpUp2Right1 b p n
+    | snd p > n && elem (fst p + 2, snd p - 2) b    = (p, (fst p + 1, snd p - 1), (fst p + 2, snd p - 2)) : jumpUp2Right1 b p n
+    | otherwise                                     = jumpUp2Right1 b p n
 
 -- x + 1, y - 2
 jumpUp2Right1 :: Grid -> Point -> Int -> [Jump]
 jumpUp2Right1 b p n
-    | snd p == n && elem (fst p + 1, snd p - 2) b = (p, (fst p + 1, snd p - 1), (fst p + 1, snd p - 2)) : jumpDown2Left1 b p n
-    | otherwise                                      = jumpDown2Left1 b p n
+    | snd p == n && elem (fst p + 1, snd p - 2) b   = (p, (fst p + 1, snd p - 1), (fst p + 1, snd p - 2)) : jumpDown2Left1 b p n
+    | otherwise                                     = jumpDown2Left1 b p n
 
 -- x - 1, y + 2
 jumpDown2Left1 :: Grid -> Point -> Int -> [Jump]
 jumpDown2Left1 b p n
     | snd p == (n - 2) && elem (fst p - 1, snd p + 2) b = [(p, (fst p, snd p + 1), (fst p - 1, snd p + 2))]
-    | otherwise                                      = []
+    | otherwise                                         = []
 
 --
 -- stateSearch
@@ -495,9 +495,9 @@ jumpDown2Left1 b p n
 
 stateSearch :: Board -> [Board] -> Grid -> [Slide] -> [Jump] -> Piece -> Int -> Int -> Board
 stateSearch board history grid slides jumps player depth num
-    | gameOver  board history num = board
-    | player == W = minimax (generateTree board history grid slides jumps W depth num) getWhiteScore
-    | otherwise = minimax (generateTree board history grid slides jumps B depth num) getBlackScore
+    | gameOver board history num    = board
+    | player == W                   = minimax (generateTree board history grid slides jumps W depth num) getWhiteScore
+    | otherwise                     = minimax (generateTree board history grid slides jumps B depth num) getBlackScore
 
 --
 -- generateTree
@@ -548,8 +548,8 @@ generateTree board history grid slides jumps player depth n = generateTreeHelper
 generateTreeHelper :: [Board] -> Grid -> [Slide] -> [Jump] -> Piece -> Int -> Int -> Int -> Board -> BoardTree
 generateTreeHelper history grid slides jumps player depth currentDepth n board
     | currentDepth == depth = (Node depth board [])
-    | player == W  = (Node currentDepth board (map (generateTreeHelper history grid slides jumps B depth (currentDepth + 1) n) (generateNewStates board history grid slides jumps W)))
-    | otherwise = (Node currentDepth board (map (generateTreeHelper history grid slides jumps W depth (currentDepth + 1) n) (generateNewStates board history grid slides jumps B)))
+    | player == W           = (Node currentDepth board (map (generateTreeHelper history grid slides jumps B depth (currentDepth + 1) n) (generateNewStates board history grid slides jumps W)))
+    | otherwise             = (Node currentDepth board (map (generateTreeHelper history grid slides jumps W depth (currentDepth + 1) n) (generateNewStates board history grid slides jumps B)))
 
 --
 -- generateNewStates
@@ -818,7 +818,7 @@ solveJumps state tile jumps player =
 minimax :: BoardTree -> (Board -> Bool -> Int) -> Board
 minimax (Node _ b children) heuristic
     | null children = b
-    | otherwise = board (fst (head (sortBy compareBoardTreeScores (map (minimaxTuple' heuristic True) children))))
+    | otherwise     = board (fst (head (sortBy compareBoardTreeScores (map (minimaxTuple' heuristic True) children))))
 
 --
 -- minimax'
@@ -843,9 +843,9 @@ minimax (Node _ b children) heuristic
 
 minimax' :: (Board -> Bool -> Int) -> Bool -> BoardTree -> Int
 minimax' heuristic isMax (Node depth board nextBoards)
-    | null nextBoards = heuristic board False
-    | isMax == False = minimum (map (minimax' heuristic True) nextBoards)
-    | otherwise = maximum (map (minimax' heuristic False) nextBoards)
+    | null nextBoards   = heuristic board False
+    | isMax == False    = minimum (map (minimax' heuristic True) nextBoards)
+    | otherwise         = maximum (map (minimax' heuristic False) nextBoards)
 
 --
 -- compareBoardTreeScores
@@ -902,16 +902,16 @@ square x = x * x
 -- Returns the number of B pieces on the board
 countBlack :: Board -> Int
 countBlack board
-    | null board = 0
-    | head board == B = 1 + countBlack (tail board)
-    | otherwise = countBlack (tail board)
+    | null board        = 0
+    | head board == B   = 1 + countBlack (tail board)
+    | otherwise         = countBlack (tail board)
 
 -- Returns the number of W pieces on the board
 countWhite :: Board -> Int
 countWhite board
-    | null board = 0
-    | head board == W = 1 + countWhite (tail board)
-    | otherwise = countWhite (tail board)
+    | null board        = 0
+    | head board == W   = 1 + countWhite (tail board)
+    | otherwise         = countWhite (tail board)
 
 -- pairs a BoardTree with its corresponding goodnessValue
 minimaxTuple' :: (Board -> Bool -> Int) -> Bool -> BoardTree -> BoardTreeScore
