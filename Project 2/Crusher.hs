@@ -45,7 +45,7 @@ type Point = (Int, Int)
 --       the second element represents a point
 --
 
-type Tile  = (Piece, Point)
+type Tile = (Piece, Point)
 
 --
 -- Board is a list of Pieces, thus it is an internal representation
@@ -201,7 +201,7 @@ gameOver board history n
 -- Returns: the Board corresponding to the string
 --
 
-strToBoard :: String  -> Board
+strToBoard :: String -> Board
 strToBoard s = map (\ x -> check x) s
     where
         check 'W' = W
@@ -211,7 +211,7 @@ strToBoard s = map (\ x -> check x) s
 --
 -- boardToStr
 --
--- This function consumes a board which is a list of either W or B  or D and
+-- This function consumes a board which is a list of either W or B or D and
 -- converts them to a list of characters, i.e 'W' or 'B' or 'D' respectively
 --
 -- Arguments:
@@ -861,9 +861,9 @@ minimax' heuristic isMax (Node depth board nextBoards)
 
 compareBoardTreeScores :: BoardTreeScore -> BoardTreeScore -> Ordering
 compareBoardTreeScores (a1,b1) (a2,b2)
-     | b1 < b2      = GT
-     | b1 == b2     = EQ
-     | otherwise    = LT
+    | b1 < b2      = GT
+    | b1 == b2     = EQ
+    | otherwise    = LT
 
 --
 -- getWhiteScore
