@@ -310,9 +310,13 @@ generateGrid n1 n2 n3 acc
 generateSlides :: Grid -> Int -> [Slide]
 generateSlides b n = generateSlidesHelper b b n
 
--- helper to generateSlides and calls slideLeft, which starts to check all valid moves.
+--
+-- Helper to generateSlides
+-- Calls slideLeft, which starts to check all valid moves
 -- The x and y translation that is being checked are documented above the slideLeft, slideRight, etc functions
--- And are only added to the list of valid slides if they are a possible move
+-- and are only added to the list of valid slides if they are a possible move
+--
+
 generateSlidesHelper :: Grid -> Grid -> Int -> [Slide]
 generateSlidesHelper originalGrid currentGrid n
     | null currentGrid  = []
@@ -390,9 +394,13 @@ slideDownLeft b p n
 generateJumps :: Grid -> Int -> [Jump]
 generateJumps b n = generateJumpsHelper b b n
 
--- helper to generateJumps and calls jumpLeft, which starts to check all valid moves.
+--
+-- Helper to generateJumps
+-- Calls jumpLeft, which starts to check all valid moves
 -- The x and y translation that is being checked are documented above the jumpLeft, jumpRight, etc functions
--- And are only added to the list of valid jumps if they are a possible move
+-- and are only added to the list of valid jumps if they are a possible move
+--
+
 generateJumpsHelper :: Grid -> Grid -> Int -> [Jump]
 generateJumpsHelper originalGrid currentGrid n
     | null currentGrid  = []
