@@ -580,30 +580,67 @@ generateTreeHelper history grid slides jumps player depth currentDepth n board
 
 generateNewStates :: Board -> [Board] -> Grid -> [Slide] -> [Jump] -> Piece -> [Board]
 generateNewStates board history grid slides jumps player =
-    map stateToBoard (applyMoves state moves player) \\ history -- set complement of history
+    map stateToBoard (applyMoves state moves player) \\ history -- Find the relative set complement of the history in all possible boards
         where
             state = boardToState board grid
             moves = moveGenerator state slides jumps player
 
--- Generate all possible states by applying each possible moves to the current state for a player
+--
+-- applyMoves
+--
+-- This function applys each possible move to the current state for a player to generate all possible states
+--
+-- Arguments:
+-- -- state: a State representing the most recent state
+-- -- moves: the list of all valid Moves that the player could make
+-- -- player: W or B representing the player the program is
+--
+-- Returns: the list of next states
+--
+
 applyMoves :: State -> [Move] -> Piece -> [State]
 applyMoves state moves player
     | null moves    = []
     | otherwise     = applyMove state (head moves) player : applyMoves state (tail moves) player
 
--- Apply a move to the state to get a possible future state
--- For each tile in state, check if move will change it
+--
+-- applyMove
+--
+-- This function applys a move to the state to get a possible future state
+--
+-- Arguments:
+-- -- state: a State representing the most recent state
+-- -- move: a valid Move the player could make
+-- -- player: W or B representing the player the program is
+--
+-- Returns: the different state as a result of applying a move
+--
+
 applyMove :: State -> Move -> Piece -> State
 applyMove state move player
-    | null state    = [] -- This case doesn't really make sense
+    -- No more tiles in the current state to check
+    | null state    = []
+    -- Recursively check each tile in state if the move will change it
     | otherwise     = processTile (head state) move player : applyMove (tail state) move player
 
--- Convert the tile if it is part of the move
+--
+-- processTile
+--
+-- This function converts the tile if it is part of the move
+--
+-- Arguments:
+-- -- tile: the Tile in the current state checked to see if it is part of the move
+-- -- move: a valid Move the player could make
+-- -- player: W or B representing the player the program is
+--
+-- Returns: the tile as a result of applying a move
+--
+
 processTile :: Tile -> Move -> Piece -> Tile
 processTile tile move player
-    -- The src tile -> becomes blank tile
+    -- The source tile becomes a blank tile
     | fst tile == player && snd tile == fst move    = (D, snd tile)
-    -- The dest tile -> becomes new tile
+    -- The destination tile becomes the new tile
     | snd tile == snd move                          = (player, snd tile)
     -- This tile is not a part of the move
     | otherwise                                     = tile
