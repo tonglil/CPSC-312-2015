@@ -940,18 +940,48 @@ getWhiteScore board _ = square (countWhite board) - square (countBlack board)
 getBlackScore :: Board -> Bool -> Int
 getBlackScore board _ = square (countBlack board) - square (countWhite board)
 
--- The 'square' function squares an integer.
+--
+-- square
+--
+-- This function squares an integer
+--
+-- Arguments:
+-- -- x: the integer being squared
+--
+-- Returns: the squared value fo the integer
+--
+
 square :: Int -> Int
 square x = x * x
 
--- Returns the number of B pieces on the board
+--
+-- countBlack
+--
+-- This function counts the number of B pieces on the board
+--
+-- Arguments:
+-- -- board: a Board
+--
+-- Returns: the number of B pieces on the board
+--
+
 countBlack :: Board -> Int
 countBlack board
     | null board        = 0
     | head board == B   = 1 + countBlack (tail board)
     | otherwise         = countBlack (tail board)
 
--- Returns the number of W pieces on the board
+--
+-- countWhite
+--
+-- This function counts the number of W pieces on the board
+--
+-- Arguments:
+-- -- board: a Board
+--
+-- Returns: the number of W pieces on the board
+--
+
 countWhite :: Board -> Int
 countWhite board
     | null board        = 0
