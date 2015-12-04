@@ -119,7 +119,7 @@ type Slide = (Point,Point)
 
 --
 -- Jump is a tuple of 2 elements
--- an internal representation of a leap
+-- an internal representation of a jump
 -- where the first element represents the point to move from
 --       the second element represents the adjacent point to move over
 --       the third element represents the point to move to
@@ -160,7 +160,7 @@ type Move = (Point,Point)
 
 crusher :: [String] -> Char -> Int -> Int -> [String]
 crusher (current:old) p d n =
-    boardToStr (stateSearch (strToBoard current) (map strToBoard old) (generateHexagonGrid n) (generateSlides (generateHexagonGrid n) n) (generateLeaps (generateHexagonGrid n) n) piece d n) : (current : old)
+    boardToStr (stateSearch (strToBoard current) (map strToBoard old) (generateHexagonGrid n) (generateSlides (generateHexagonGrid n) n) (generateJumps (generateHexagonGrid n) n) piece d n) : (current : old)
         where piece = if p == 'W' then W else B
 
 --
@@ -367,36 +367,36 @@ slideDownLeft b p n
     | otherwise                         = []
 
 --
--- generateLeaps
+-- generateJumps
 --
 -- This function consumes a grid and the size of the grid, accordingly
--- generates a list of all possible leaps from any point on the grid over
+-- generates a list of all possible jumps from any point on the grid over
 -- any adjacent point on the grid to any point next to the adjacent point
 -- such that it is movement in the same direction
 --
 -- Arguments:
--- -- b: the Grid to generate leaps for
+-- -- b: the Grid to generate jumps for
 -- -- n: an Integer representing the dimensions of the grid
 --
 -- Note: This function is only called at the initial setup of the game,
 --       it is a part of the internal representation of the game, this
---       list of all possible leaps is only generated once; and when
---       generating next moves, the program decides which leaps out of
---       all these possible leaps could a player actually make
+--       list of all possible jumps is only generated once; and when
+--       generating next moves, the program decides which jumps out of
+--       all these possible jumps could a player actually make
 --
 -- Returns: the list of all Jumps possible on the given grid
 --
 
-generateLeaps :: Grid -> Int -> [Jump]
-generateLeaps b n = generateLeapsHelper b b n
+generateJumps :: Grid -> Int -> [Jump]
+generateJumps b n = generateJumpsHelper b b n
 
--- helper to generateLeaps and calls jumpLeft, which starts to check all valid moves.
+-- helper to generateJumps and calls jumpLeft, which starts to check all valid moves.
 -- The x and y translation that is being checked are documented above the jumpLeft, jumpRight, etc functions
 -- And are only added to the list of valid jumps if they are a possible move
-generateLeapsHelper :: Grid -> Grid -> Int -> [Jump]
-generateLeapsHelper originalGrid currentGrid n
+generateJumpsHelper :: Grid -> Grid -> Int -> [Jump]
+generateJumpsHelper originalGrid currentGrid n
     | null currentGrid        = []
-    | otherwise     = jumpLeft originalGrid (head currentGrid) n ++ generateLeapsHelper originalGrid (tail currentGrid) n
+    | otherwise     = jumpLeft originalGrid (head currentGrid) n ++ generateJumpsHelper originalGrid (tail currentGrid) n
 
 -- x - 2, y
 jumpLeft :: Grid -> Point -> Int -> [Jump]
@@ -745,8 +745,8 @@ moveGeneratorTile :: State -> Tile -> [Slide] -> [Jump] -> Piece -> [Move]
 moveGeneratorTile state tile slides jumps player =
     -- Look for all slide moves possible from the current tile
     solveSlides state tile slides ++
-    -- Look for all leap moves possible from the current tile
-    solveLeaps state tile jumps player
+    -- Look for all jump moves possible from the current tile
+    solveJumps state tile jumps player
 
 --
 -- solveSlides
@@ -773,7 +773,7 @@ solveSlides state tile slides =
         freeStates = [snd x | x <- state, fst x == D]
 
 --
--- solveLeaps
+-- solveJumps
 --
 -- This function consumes a state, a tile, a list of possible jumps, and a piece
 -- to generate a list of valid jump moves from a tile
@@ -787,15 +787,15 @@ solveSlides state tile slides =
 -- Returns: the list of valid jump moves that the player could make from a tile
 --
 
-solveLeaps :: State -> Tile -> [Jump] -> Piece -> [Move]
-solveLeaps state tile jumps player =
+solveJumps :: State -> Tile -> [Jump] -> Piece -> [Move]
+solveJumps state tile jumps player =
     -- Jump is valid when the end point is not occupied by the player; move is the start and end points
-    [(tripleFst x, tripleLst x) | x <- legalLeaps, elem (tripleLst x) freeStates]
+    [(tripleFst x, tripleLst x) | x <- legalJumps, elem (tripleLst x) freeStates]
     where
         -- Get jumps that start at the tile's point
-        allLeaps = [x | x <- jumps, tripleFst x == snd tile]
+        allJumps = [x | x <- jumps, tripleFst x == snd tile]
         -- Of those jumps, check that the piece lept over is the player's color
-        legalLeaps = [x | x <- allLeaps, elem (player, tripleMid x) state]
+        legalJumps = [x | x <- allJumps, elem (player, tripleMid x) state]
         -- All tiles not occupied by the player
         freeStates = [snd x | x <- state, fst x /= player]
 
