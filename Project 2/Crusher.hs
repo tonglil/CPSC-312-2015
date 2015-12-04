@@ -160,9 +160,9 @@ type Move = (Point,Point)
 
 
 crusher :: [String] -> Char -> Int -> Int -> [String]
-crusher (current:old) p d n
-    | p == 'W' = boardToStr (stateSearch (strToBoard current) (map strToBoard old) (generateHexagonGrid n) (generateSlides (generateHexagonGrid n) n) (generateLeaps (generateHexagonGrid n) n) W d n) : (current:old)
-    | otherwise = boardToStr (stateSearch (strToBoard current) (map strToBoard old) (generateHexagonGrid n) (generateSlides (generateHexagonGrid n) n) (generateLeaps (generateHexagonGrid n) n) B d n) : (current:old)
+crusher (current:old) p d n =
+    boardToStr (stateSearch (strToBoard current) (map strToBoard old) (generateHexagonGrid n) (generateSlides (generateHexagonGrid n) n) (generateLeaps (generateHexagonGrid n) n) piece d n) : (current : old)
+        where piece = if p == 'W' then W else B
 
 -- generateHexagonGrid
 --
