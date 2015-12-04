@@ -986,10 +986,7 @@ square x = x * x
 --
 
 countBlack :: Board -> Int
-countBlack board
-    | null board        = 0
-    | head board == B   = 1 + countBlack (tail board)
-    | otherwise         = countBlack (tail board)
+countBlack board = countBoard board B
 
 --
 -- countWhite
@@ -1003,7 +1000,22 @@ countBlack board
 --
 
 countWhite :: Board -> Int
-countWhite board
-    | null board        = 0
-    | head board == W   = 1 + countWhite (tail board)
-    | otherwise         = countWhite (tail board)
+countWhite board = countBoard board W
+
+--
+-- countBoard
+--
+-- This function counts the number of a type of pieces on the board
+--
+-- Arguments:
+-- -- board: a Board
+-- -- piece: the Piece to count
+--
+-- Returns: the number of pieces on the board
+--
+
+countBoard :: Board -> Piece -> Int
+countBoard board piece
+    | null board            = 0
+    | head board == piece   = 1 + countBoard (tail board) piece
+    | otherwise             = countBoard (tail board) piece
