@@ -20,6 +20,7 @@ import Data.List
 -- crusher
 -- custom data types (already done)
 
+--
 -- Piece is a data representation of possible pieces on a board
 -- where D is an empty spot on the board
 --       W is a piece of the White player
@@ -102,7 +103,6 @@ data Tree a = Node {depth :: Int, board :: a, nextBoards :: [Tree a]} deriving (
 
 type BoardTree = Tree Board
 
-
 --
 -- BoardTreeScore is a tuple of a BoardTree and its corresponding goodness value
 --
@@ -158,12 +158,12 @@ type Move = (Point,Point)
 -- Returns: a list of String with the new current board consed onto the front
 --
 
-
 crusher :: [String] -> Char -> Int -> Int -> [String]
 crusher (current:old) p d n =
     boardToStr (stateSearch (strToBoard current) (map strToBoard old) (generateHexagonGrid n) (generateSlides (generateHexagonGrid n) n) (generateLeaps (generateHexagonGrid n) n) piece d n) : (current : old)
         where piece = if p == 'W' then W else B
 
+--
 -- generateHexagonGrid
 --
 -- This function consumes one integer and generates  a
@@ -173,6 +173,7 @@ crusher (current:old) p d n =
 -- -- n: side length
 --
 -- Returns: the corresponding hexagon grid
+--
 
 generateHexagonGrid :: Int -> Grid
 generateHexagonGrid n = generateGrid n (n - 1) (2 * (n - 1)) []
@@ -243,7 +244,6 @@ boardToStr b = map (\ x -> check x) b
         check W = 'W'
         check B = 'B'
         check D = '-'
-
 
 --
 -- generateGrid
@@ -528,7 +528,6 @@ stateSearch board history grid slides jumps player depth num
 generateTree :: Board -> [Board] -> Grid -> [Slide] -> [Jump] -> Piece -> Int -> Int -> BoardTree
 generateTree board history grid slides jumps player depth n = generateTreeHelper history grid slides jumps player depth 0 n board
 
-
 --
 -- generateTreeHelper
 --
@@ -606,7 +605,6 @@ processTile tile move player
     -- This tile is not a part of the move
     | otherwise                                     = tile
 
-
 --
 -- boardToState
 --
@@ -660,6 +658,7 @@ stateToBoard state
 -- -- c: anything
 --
 -- Returns: the selected value in the triple-tuple
+--
 
 tripleFst :: (a, b, c) -> a
 tripleFst (x, _, _) = x
@@ -867,11 +866,11 @@ minimax' heuristic isMax (Node depth board nextBoards)
 
 compareBoardTreeScores :: BoardTreeScore -> BoardTreeScore -> Ordering
 compareBoardTreeScores (a1,b1) (a2,b2)
-     | b1 < b2      = GT  
-     | b1 == b2     = EQ  
+     | b1 < b2      = GT
+     | b1 == b2     = EQ
      | otherwise    = LT
 
--- 
+--
 -- getWhiteScore
 --
 -- This function is used to the goodness value of the board in perspective of W
@@ -886,7 +885,7 @@ compareBoardTreeScores (a1,b1) (a2,b2)
 getWhiteScore :: Board -> Bool -> Int
 getWhiteScore board _ = square (countWhite board) - square (countBlack board)
 
--- 
+--
 -- getBlackScore
 --
 -- This function is used to the goodness value of the board in perspective of B
@@ -918,7 +917,6 @@ countWhite board
     | null board = 0
     | head board == W = 1 + countWhite (tail board)
     | otherwise = countWhite (tail board)
-
 
 -- pairs a BoardTree with its corresponding goodnessValue
 minimaxTuple' :: (Board -> Bool -> Int) -> Bool -> BoardTree -> BoardTreeScore
