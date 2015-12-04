@@ -164,21 +164,6 @@ crusher (current:old) p d n =
         where piece = if p == 'W' then W else B
 
 --
--- generateHexagonGrid
---
--- This function consumes one integer and generates  a
--- regular hexagon of side length n
---
--- Arguments:
--- -- n: side length
---
--- Returns: the corresponding hexagon grid
---
-
-generateHexagonGrid :: Int -> Grid
-generateHexagonGrid n = generateGrid n (n - 1) (2 * (n - 1)) []
-
---
 -- gameOver
 --
 -- This function consumes a board, a list of boards, and the dimension
@@ -244,6 +229,21 @@ boardToStr b = map (\ x -> check x) b
         check W = 'W'
         check B = 'B'
         check D = '-'
+
+--
+-- generateHexagonGrid
+--
+-- This function consumes one integer and generates a
+-- regular hexagon of side length n
+--
+-- Arguments:
+-- -- n: side length
+--
+-- Returns: the corresponding hexagon grid
+--
+
+generateHexagonGrid :: Int -> Grid
+generateHexagonGrid n = generateGrid n (n - 1) (2 * (n - 1)) []
 
 --
 -- generateGrid
