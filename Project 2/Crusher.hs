@@ -844,6 +844,26 @@ solveJumps state tile jumps player =
         -- All tiles not occupied by the player
         freeStates = [snd x | x <- state, fst x /= player]
 
+
+--
+-- minimaxTuple
+--
+-- This function pairs a BoardTree with its corresponding goodnessValue
+--
+-- Arguments:
+-- -- heuristic: a paritally evaluated boardEvaluator representing the
+--               appropriate heuristic to apply based on the size of the board,
+--               who the program is playing as, and all the boards already seen
+-- -- isMax: a Boolean indicating whether the function should be maximizing
+--           or miniziming the goodness values of its children
+-- -- boardTree: a BoardTree
+--
+-- Returns: a minimax tuple
+--
+
+minimaxTuple' :: (Board -> Bool -> Int) -> Bool -> BoardTree -> BoardTreeScore
+minimaxTuple' heuristic isMax boardTree = (boardTree, (minimax' heuristic isMax boardTree))
+
 --
 -- minimax
 --
@@ -987,7 +1007,3 @@ countWhite board
     | null board        = 0
     | head board == W   = 1 + countWhite (tail board)
     | otherwise         = countWhite (tail board)
-
--- pairs a BoardTree with its corresponding goodnessValue
-minimaxTuple' :: (Board -> Bool -> Int) -> Bool -> BoardTree -> BoardTreeScore
-minimaxTuple' heuristic isMax boardTree = (boardTree, (minimax' heuristic isMax boardTree))
