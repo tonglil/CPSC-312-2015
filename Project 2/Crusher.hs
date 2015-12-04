@@ -895,13 +895,13 @@ minimax (Node _ b children) heuristic
 -- it reaches the top to the base node, and produces that value.
 --
 -- Arguments:
--- -- (Node _ b []): a BoardTree
--- -- (Node _ b children): a BoardTree
 -- -- heuristic: a paritally evaluated boardEvaluator representing the
 --               appropriate heuristic to apply based on the size of the board,
 --               who the program is playing as, and all the boards already seen
--- -- maxPlayer: a Boolean indicating whether the function should be maximizing
---               or miniziming the goodness values of its children
+-- -- isMax: a Boolean indicating whether the function should be maximizing
+--           or miniziming the goodness values of its children
+-- -- (Node _ b []): a BoardTree
+-- -- (Node _ b children): a BoardTree
 --
 -- Returns: the minimax value at the top of the tree
 --
